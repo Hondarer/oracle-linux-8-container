@@ -10,10 +10,10 @@ source ./stop-pod.sh
 
 # Check if the container image exists
 if ! podman images | grep -q "${CONTAINER_NAME}"; then
-    source ./build-pod.sh
-    #echo "Error: ${CONTAINER_NAME} image not found."
-    #echo "Please ensure ${CONTAINER_NAME} is registered before running this script."
-    #exit 1
+    #source ./build-pod.sh
+    echo "Error: image ${CONTAINER_NAME} not found."
+    echo "Please ensure ${CONTAINER_NAME} is registered before running this script."
+    exit 1
 fi
 
 # ホストのユーザー情報を取得

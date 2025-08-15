@@ -5,6 +5,24 @@
 
 CONTAINER_NAME=oracle-linux-8
 
+# src/keys が存在しない場合は作成
+if [ ! -d ./src/keys ]; then
+    echo "Creating ./src/keys directory..."
+    mkdir -p ./src/keys
+fi
+
+# src/packages が存在しない場合は作成
+if [ ! -d ./src/packages ]; then
+    echo "Creating ./src/packages directory..."
+    mkdir -p ./src/packages
+fi
+
+# src/fonts が存在しない場合は作成
+if [ ! -d ./src/fonts ]; then
+    echo "Creating ./src/fonts directory..."
+    mkdir -p ./src/fonts
+fi
+
 # container-release の作成
 echo "Build on $(LANG=C && date)" > ./src/container-release
 

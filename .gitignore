@@ -1,1 +1,8 @@
-storage
+/src/container-release
+/src/fonts
+/src/keys
+/src/packages/*
+!/src/packages/man-pages-ja-auto-installer.sh
+
+/image
+/storage
