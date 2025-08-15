@@ -51,6 +51,11 @@ if [ -d "/home/${HOST_USER}" ]; then
     chown -R "${HOST_UID}:${HOST_GID}" "/home/${HOST_USER}"
 fi
 
+# ワークスペースディレクトリの所有権を確認・修正
+if [ -d "/workspace}" ]; then
+    chown -R "${HOST_UID}:${HOST_GID}" "/workspace"
+fi
+
 # USER_HOME が空 (~/.ssh は評価対象から除く) の場合に初期ファイルを配置
 if [ -z "$(find /home/${HOST_USER} -mindepth 1 -not -path "/home/${HOST_USER}/.ssh/*" -not -name ".ssh" -print -quit 2>/dev/null)" ]; then
     echo "Initializing home for ${HOST_USER}..."
