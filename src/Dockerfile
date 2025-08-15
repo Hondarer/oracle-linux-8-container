@@ -1,11 +1,6 @@
 FROM oraclelinux:8
 EXPOSE 22
 
-# ビルド引数の定義
-ARG USER_NAME=user
-ARG UID=1000
-ARG GID=1000
-
 # パッケージの更新とインストール
 RUN dnf update -y && \
     dnf install -y \
@@ -88,8 +83,7 @@ RUN dnf update -y && \
         vlgothic-fonts \
         vulkan-loader \
         xdg-utils \
-        xkeyboard-config && \
-        dnf clean all
+        xkeyboard-config
 
 RUN alternatives --set java $(alternatives --display java 2>/dev/null | grep -E "java-17-openjdk.*bin/java" | head -1 | awk '{print $1}') && \
     alternatives --set python /usr/bin/python3.11 && \
@@ -99,6 +93,10 @@ RUN alternatives --set java $(alternatives --display java 2>/dev/null | grep -E 
 RUN pip install \
         hjson \
         gcovr
+
+RUN dnf clean all && \
+    rm -f /var/log/dnf* /var/log/hawkey.log && \
+    rm -rf /var/cache/dnf
 
 # ロケールを設定
 ENV LANG=ja_JP.UTF-8
@@ -191,7 +189,7 @@ RUN echo "Processing manual pages with mandb..."; \
     mandb > /dev/null 2>&1
 
 # SSH ホストキーの配置または生成
-# /tmp/keys にssh_host_*_key* が存在する場合は、ファイルを /etc/ssh にコピーし適切なオーナー、パーミッションを設定
+# keys にssh_host_*_key* が存在する場合は、ファイルを /etc/ssh にコピーし適切なオーナー、パーミッションを設定
 # 存在しない場合は、SSH ホストキーの生成
 # SSH ホストキー生成後の再接続時は `ssh-keygen -R "[127.0.0.1]:40022"` などを行い過去のホストキーをクリアすること
 ADD keys /tmp/keys/
@@ -206,26 +204,22 @@ RUN if [ -n "$(ls -A /tmp/keys/ssh_host_*_key* 2>/dev/null)" ]; then \
         ssh-keygen -A; \
     fi
 
-# デフォルトユーザー作成
-RUN echo "%wheel ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/wheel && \
-    groupadd -g ${GID} ${USER_NAME} && \
-    useradd -u ${UID} -g ${GID} -G wheel -d /home/${USER_NAME} -m -s /bin/bash ${USER_NAME} && \
-    echo ${USER_NAME}:${USER_NAME}_passwd | chpasswd
+# clean /tmp
+RUN rm -rf /tmp/*
+
+# wheel グループの sudo 設定
+RUN echo "%wheel ALL=(ALL) NOPASSWD: ALL" >/etc/sudoers.d/wheel
 
 # container-release の配置
 ADD container-release /etc
 
-# clean /tmp
-RUN rm -rf /tmp/*
-
-# ユーザーの切り替え
-USER ${USER_NAME}
-
 # 作業用ディレクトリの作成
 WORKDIR /workspace
 
-# コンテナ起動時に実行するスクリプト
+# エントリーポイント用スクリプトの配置
 ADD entrypoint.sh /usr/local/bin
 RUN chown root:root /usr/local/bin/entrypoint.sh && \
     chmod 0755 /usr/local/bin/entrypoint.sh
-ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
+
+# エントリーポイントの設定
+ENTRYPOINT ["/bin/sh", "-c", "/usr/local/bin/entrypoint.sh > /var/log/entrypoint.log 2>&1"]

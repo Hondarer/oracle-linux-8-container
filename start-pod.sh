@@ -17,35 +17,39 @@ if ! podman images | grep -q "${CONTAINER_NAME}"; then
 fi
 
 # ホストのユーザー情報を取得
-USER_NAME=$(whoami)
-#UID=$(id -u)
+# USER, UID は OS にて設定済
 GID=$(id -g)
 
+echo "Starting container with user: ${USER} (UID: ${UID}, GID: ${GID})"
+
 # ホスト側ディレクトリ準備
-mkdir -p ./storage/1/home_${USER_NAME}
+mkdir -p ./storage/1/home_${USER}
 mkdir -p ./storage/1/workspace
 
 # ~/.ssh/id_rsa.pub があれば、.ssh/authorized_keys に設定
-if [ -f ~/.ssh/id_rsa.pub ] && [ ! -f ./storage/1/home_${USER_NAME}/.ssh/authorized_keys ]; then
-    mkdir -p ./storage/1/home_${USER_NAME}/.ssh
-    cp ~/.ssh/id_rsa.pub ./storage/1/home_${USER_NAME}/.ssh/authorized_keys
+if [ -f ~/.ssh/id_rsa.pub ] && [ ! -f ./storage/1/home_${USER}/.ssh/authorized_keys ]; then
+    mkdir -p ./storage/1/home_${USER}/.ssh
+    cp ~/.ssh/id_rsa.pub ./storage/1/home_${USER}/.ssh/authorized_keys
     # パーミッションの設定
-    chmod 700 ./storage/1/home_${USER_NAME}/.ssh
-    chmod 600 ./storage/1/home_${USER_NAME}/.ssh/authorized_keys
+    chmod 700 ./storage/1/home_${USER}/.ssh
+    chmod 600 ./storage/1/home_${USER}/.ssh/authorized_keys
 fi
 
-# コンテナ起動 (UID マッピング)
+# コンテナ起動 (UID マッピング + 環境変数でユーザー情報を渡す)
+# --userns=keep-id で UID と GID のマッピングを維持しつつ、
+# コンテナ内で初期化操作を行いたいため、root で起動
 echo "Starting container with keep-id userns..."
 podman run -d \
     --name ${CONTAINER_NAME}_1 \
     --userns=keep-id \
+    --user root \
     -p 40022:22 \
-    -v ./storage/1/home_${USER_NAME}:/home/${USER_NAME}:Z \
+    -v ./storage/1/home_${USER}:/home/${USER}:Z \
     -v ./storage/1/workspace:/workspace:Z \
     --restart unless-stopped \
-    --env USER_NAME=${USER_NAME} \
-    --env UID=${UID} \
-    --env GID=${GID} \
+    --env HOST_USER=${USER} \
+    --env HOST_UID=${UID} \
+    --env HOST_GID=${GID} \
     ${CONTAINER_NAME}
 
 if [ $? -ne 0 ]; then

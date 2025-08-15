@@ -26,12 +26,7 @@ fi
 # container-release の作成
 echo "Build on $(LANG=C && date)" > ./src/container-release
 
-# ホストのユーザー情報を取得
-USER_NAME=$(whoami)
-#UID=$(id -u)
-GID=$(id -g)
-
-echo "Building with user info: USER_NAME=${USER_NAME}, UID=${UID}, GID=${GID}"
+echo "Building portable container image..."
 
 # 既存のコンテナを停止
 source ./stop-pod.sh
@@ -42,11 +37,7 @@ echo "Clean old container successfully."
 
 # イメージをビルド
 echo "Building image..."
-podman build -t ${CONTAINER_NAME} \
-    --build-arg USER_NAME="${USER_NAME}" \
-    --build-arg UID="${UID}" \
-    --build-arg GID="${GID}" \
-    ./src/
+podman build -t ${CONTAINER_NAME} ./src/
 
 if [ $? -ne 0 ]; then
     echo "Error: Failed to build container."
