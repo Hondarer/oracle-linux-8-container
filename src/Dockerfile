@@ -181,7 +181,7 @@ RUN cd /tmp && \
     cd /usr/local/bin && ln -s plantuml-1.2025.4.jar plantuml.jar && \
     echo -e "#!/bin/bash" > /usr/local/bin/plantuml && \
     echo -e "export LANG=ja_JP.UTF-8" >> /usr/local/bin/plantuml && \
-    echo -e "/usr/bin/java -Djava.io.tmpdir=/var/tmp -Djava.awt.headless=true -jar /usr/local/bin/plantuml.jar -charset UTF-8 \"$@\"" >> /usr/local/bin/plantuml && \
+    echo -e "/usr/bin/java -Djava.io.tmpdir=/var/tmp -Djava.awt.headless=true -jar /usr/local/bin/plantuml.jar -charset UTF-8 \"\$@\"" >> /usr/local/bin/plantuml && \
     chmod 0755 /usr/local/bin/plantuml
 
 # mandb
