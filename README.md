@@ -106,15 +106,6 @@ pandoc README.md -o README.pdf
 
 ## 高度な使い方
 
-### カスタムユーザーでの起動
-
-環境変数でユーザー情報を指定できます：
-
-```bash
-# カスタムユーザー情報で起動
-HOST_USER=developer HOST_UID=1001 HOST_GID=1001 ./start-pod.sh
-```
-
 ### イメージの保存・読み込み
 
 ```bash
@@ -128,7 +119,7 @@ HOST_USER=developer HOST_UID=1001 HOST_GID=1001 ./start-pod.sh
 ### 追加パッケージの事前配置
 
 `src/packages/` にパッケージファイルを配置すると、キャッシュとして動作します。  
-対象ファイルは、`src/Dockerfile` を参照してください。
+対象パッケージファイルは、`src/Dockerfile` を参照してください。
 
 ### カスタムフォントの追加
 

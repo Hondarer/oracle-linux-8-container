@@ -222,4 +222,4 @@ RUN chown root:root /usr/local/bin/entrypoint.sh && \
     chmod 0755 /usr/local/bin/entrypoint.sh
 
 # エントリーポイントの設定
-ENTRYPOINT ["/bin/sh", "-c", "/usr/local/bin/entrypoint.sh > /var/log/entrypoint.log 2>&1"]
+ENTRYPOINT ["/bin/sh", "-c", "/usr/local/bin/entrypoint.sh 2>&1 | tee /var/log/entrypoint.log"]
