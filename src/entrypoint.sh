@@ -48,12 +48,20 @@ echo "Set password for ${HOST_USER}: ${HOST_USER}_passwd"
 
 # ホームディレクトリの所有権を確認・修正
 if [ -d "/home/${HOST_USER}" ]; then
-    chown -R "${HOST_UID}:${HOST_GID}" "/home/${HOST_USER}"
+    current_uid=$(stat -c "%u" "/home/${HOST_USER}")
+    current_gid=$(stat -c "%g" "/home/${HOST_USER}")
+    if [ "$current_uid" -ne "$HOST_UID" ] || [ "$current_gid" -ne "$HOST_GID" ]; then
+        chown "${HOST_UID}:${HOST_GID}" "/home/${HOST_USER}"
+    fi
 fi
 
 # ワークスペースディレクトリの所有権を確認・修正
-if [ -d "/workspace}" ]; then
-    chown -R "${HOST_UID}:${HOST_GID}" "/workspace"
+if [ -d "/workspace" ]; then
+    current_uid=$(stat -c "%u" "/workspace")
+    current_gid=$(stat -c "%g" "/workspace")
+    if [ "$current_uid" -ne "$HOST_UID" ] || [ "$current_gid" -ne "$HOST_GID" ]; then
+        chown "${HOST_UID}:${HOST_GID}" "/workspace"
+    fi
 fi
 
 # USER_HOME が空 (~/.ssh は評価対象から除く) の場合に初期ファイルを配置
