@@ -83,18 +83,15 @@ RUN dnf update -y && \
         vlgothic-fonts \
         vulkan-loader \
         xdg-utils \
-        xkeyboard-config
-
-RUN alternatives --set java $(alternatives --display java 2>/dev/null | grep -E "java-17-openjdk.*bin/java" | head -1 | awk '{print $1}') && \
+        xkeyboard-config && \
+    alternatives --set java $(alternatives --display java 2>/dev/null | grep -E "java-17-openjdk.*bin/java" | head -1 | awk '{print $1}') && \
     alternatives --set python /usr/bin/python3.11 && \
     update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1 && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3.11 2
-
-RUN pip install \
+    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3.11 2 && \
+    pip install \
         hjson \
-        gcovr
-
-RUN dnf clean all && \
+        gcovr && \
+    dnf clean all && \
     rm -f /var/log/dnf* /var/log/hawkey.log && \
     rm -rf /var/cache/dnf
 
@@ -113,7 +110,8 @@ RUN if [ -n "$(ls -A /tmp/fonts 2>/dev/null)" ]; then \
         chmod 0644 /tmp/fonts/* && \
         cp /tmp/fonts/* /usr/share/fonts/. && \
         fc-cache -fv > /dev/null 2>&1; \
-    fi
+    fi && \
+    rm -rf /tmp/fonts
 
 # packages の配置
 ADD packages /tmp/packages/
@@ -125,7 +123,8 @@ RUN cd /tmp && \
     fi && \
     tar xzf packages/man-pages-ja-20231115.tar.gz && \
     cd man-pages-ja-20231115 && \
-    sh /tmp/packages/man-pages-ja-auto-installer.sh
+    sh /tmp/packages/man-pages-ja-auto-installer.sh && \
+    rm -rf /tmp/man-pages-ja-20231115
 
 # doxybook2
 RUN cd /tmp && \
@@ -136,7 +135,8 @@ RUN cd /tmp && \
     chown -R root:root doxybook2.el8.x86_64-1.6.1 && \
     cp -rp doxybook2.el8.x86_64-1.6.1/bin/* /usr/local/bin/. && \
     cp -rp doxybook2.el8.x86_64-1.6.1/include/* /usr/local/include/. && \
-    cp -rp doxybook2.el8.x86_64-1.6.1/lib/* /usr/local/lib/.
+    cp -rp doxybook2.el8.x86_64-1.6.1/lib/* /usr/local/lib/. && \
+    rm -rf /tmp/doxybook2.el8.x86_64-1.6.1
 
 # pandoc
 RUN cd /tmp && \
@@ -151,7 +151,8 @@ RUN cd /tmp && \
     ln -s /usr/local/bin/pandoc /usr/local/bin/pandoc-lua && \
     install -m 0644 "$BASE/share/man/man1/pandoc.1.gz" /usr/local/share/man/man1/pandoc.1.gz && \
     install -m 0644 "$BASE/share/man/man1/pandoc-server.1.gz" /usr/local/share/man/man1/pandoc-server.1.gz && \
-    install -m 0644 "$BASE/share/man/man1/pandoc-lua.1.gz" /usr/local/share/man/man1/pandoc-lua.1.gz
+    install -m 0644 "$BASE/share/man/man1/pandoc-lua.1.gz" /usr/local/share/man/man1/pandoc-lua.1.gz && \
+    rm -rf "/tmp/$BASE"
 
 # pandoc-crossref
 RUN cd /tmp && \
@@ -162,7 +163,8 @@ RUN cd /tmp && \
     gzip -9n pandoc-crossref.1 && \
     install -d /usr/local/bin /usr/local/share/man/man1 && \
     install -m 0755 "pandoc-crossref" /usr/local/bin/pandoc-crossref && \
-    install -m 0644 "pandoc-crossref.1.gz" /usr/local/share/man/man1/pandoc-crossref.1.gz
+    install -m 0644 "pandoc-crossref.1.gz" /usr/local/share/man/man1/pandoc-crossref.1.gz && \
+    rm -rf /tmp/pandoc-crossref /tmp/pandoc-crossref pandoc-crossref.1.gz
 
 # googletest
 RUN cd /tmp && \
