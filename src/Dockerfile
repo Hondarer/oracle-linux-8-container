@@ -1,5 +1,29 @@
+# syntax=docker/dockerfile:1
+
 FROM oraclelinux:8
+
+# ポート 22 を公開する宣言
 EXPOSE 22
+
+# 環境変数を設定
+ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+ENV SHELL="/bin/bash"
+
+# UID:1000 以上のユーザーとグループの削除 (nobody は除外)
+RUN echo "Listing users with UID >= 1000:"; \
+    awk -F: '$3 >= 1000 {print $1 ":" $3}' /etc/passwd && \
+    echo "Removing users with UID >= 1000 and their home directories (excluding nobody):"; \
+    awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd | while read user; do \
+        echo "Removing user: $user"; \
+        userdel -r "$user" 2>/dev/null || true; \
+    done && \
+    echo "Listing groups with GID >= 1000:"; \
+    awk -F: '$3 >= 1000 {print $1 ":" $3}' /etc/group && \
+    echo "Removing groups with GID >= 1000 (excluding nobody):"; \
+    awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/group | while read group; do \
+        echo "Removing group: $group"; \
+        groupdel "$group" 2>/dev/null || true; \
+    done
 
 # パッケージの更新とインストール
 RUN dnf update -y && \
@@ -98,52 +122,50 @@ RUN dnf update -y && \
 # ロケールを設定
 ENV LANG=ja_JP.UTF-8
 
-# 環境変数を設定
-ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-ENV SHELL="/bin/bash"
-
 # 追加フォント
-ADD fonts /tmp/fonts/
-RUN if [ -n "$(ls -A /tmp/fonts 2>/dev/null)" ]; then \
+RUN --mount=type=bind,source=fonts,target=/tmp/fonts,readonly \
+    if [ -n "$(ls -A /tmp/fonts 2>/dev/null)" ]; then \
         echo "Installing fonts..."; \
-        chown root:root /tmp/fonts/* && \
-        chmod 0644 /tmp/fonts/* && \
-        cp /tmp/fonts/* /usr/share/fonts/. && \
+        cp /tmp/fonts/* /usr/share/fonts/ && \
+        chown root:root /usr/share/fonts/* && \
+        chmod 0644 /usr/share/fonts/* && \
         fc-cache -fv > /dev/null 2>&1; \
-    fi && \
-    rm -rf /tmp/fonts
+    fi
 
-# packages の配置
-ADD packages /tmp/packages/
-
-# man-pages-ja
-RUN cd /tmp && \
+# 追加パッケージのインストール
+RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
+    cd /tmp && \
+    # man-pages-ja
     if [ ! -f packages/man-pages-ja-20231115.tar.gz ]; then \
-        curl -o packages/man-pages-ja-20231115.tar.gz https://linuxjm.sourceforge.io/man-pages-ja-20231115.tar.gz; \
+        curl -o /tmp/man-pages-ja-20231115.tar.gz https://linuxjm.sourceforge.io/man-pages-ja-20231115.tar.gz; \
+    else \
+        cp packages/man-pages-ja-20231115.tar.gz /tmp/; \
     fi && \
-    tar xzf packages/man-pages-ja-20231115.tar.gz && \
+    tar xzf man-pages-ja-20231115.tar.gz && \
     cd man-pages-ja-20231115 && \
-    sh /tmp/packages/man-pages-ja-auto-installer.sh && \
-    rm -rf /tmp/man-pages-ja-20231115
-
-# doxybook2
-RUN cd /tmp && \
+    if [ -f /tmp/packages/man-pages-ja-auto-installer.sh ]; then \
+        sh /tmp/packages/man-pages-ja-auto-installer.sh; \
+    fi && \
+    cd /tmp && rm -rf man-pages-ja-20231115 && \
+    # doxybook2
     if [ ! -f packages/doxybook2.el8.x86_64-1.6.1.tar.gz ]; then \
-        curl -L -o packages/doxybook2.el8.x86_64-1.6.1.tar.gz https://github.com/Hondarer/doxybook2.el8.x86_64/archive/refs/tags/v1.6.1.tar.gz; \
+        curl -L -o /tmp/doxybook2.el8.x86_64-1.6.1.tar.gz https://github.com/Hondarer/doxybook2.el8.x86_64/archive/refs/tags/v1.6.1.tar.gz; \
+    else \
+        cp packages/doxybook2.el8.x86_64-1.6.1.tar.gz /tmp/; \
     fi && \
-    tar xfz packages/doxybook2.el8.x86_64-1.6.1.tar.gz && \
+    tar xfz doxybook2.el8.x86_64-1.6.1.tar.gz && \
     chown -R root:root doxybook2.el8.x86_64-1.6.1 && \
-    cp -rp doxybook2.el8.x86_64-1.6.1/bin/* /usr/local/bin/. && \
-    cp -rp doxybook2.el8.x86_64-1.6.1/include/* /usr/local/include/. && \
-    cp -rp doxybook2.el8.x86_64-1.6.1/lib/* /usr/local/lib/. && \
-    rm -rf /tmp/doxybook2.el8.x86_64-1.6.1
-
-# pandoc
-RUN cd /tmp && \
+    cp -rp doxybook2.el8.x86_64-1.6.1/bin/* /usr/local/bin/ && \
+    cp -rp doxybook2.el8.x86_64-1.6.1/include/* /usr/local/include/ && \
+    cp -rp doxybook2.el8.x86_64-1.6.1/lib/* /usr/local/lib/ && \
+    rm -rf doxybook2.el8.x86_64-1.6.1 && \
+    # pandoc
     if [ ! -f packages/pandoc-3.7.0.2-linux-amd64.tar.gz ]; then \
-        curl -L -o packages/pandoc-3.7.0.2-linux-amd64.tar.gz https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-linux-amd64.tar.gz; \
+        curl -L -o /tmp/pandoc-3.7.0.2-linux-amd64.tar.gz https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-linux-amd64.tar.gz; \
+    else \
+        cp packages/pandoc-3.7.0.2-linux-amd64.tar.gz /tmp/; \
     fi && \
-    tar xfz packages/pandoc-3.7.0.2-linux-amd64.tar.gz && \
+    tar xfz pandoc-3.7.0.2-linux-amd64.tar.gz && \
     BASE="pandoc-3.7.0.2" && \
     install -d /usr/local/bin /usr/local/share/man/man1 && \
     install -m 0755 "$BASE/bin/pandoc" /usr/local/bin/pandoc && \
@@ -152,39 +174,43 @@ RUN cd /tmp && \
     install -m 0644 "$BASE/share/man/man1/pandoc.1.gz" /usr/local/share/man/man1/pandoc.1.gz && \
     install -m 0644 "$BASE/share/man/man1/pandoc-server.1.gz" /usr/local/share/man/man1/pandoc-server.1.gz && \
     install -m 0644 "$BASE/share/man/man1/pandoc-lua.1.gz" /usr/local/share/man/man1/pandoc-lua.1.gz && \
-    rm -rf "/tmp/$BASE"
-
-# pandoc-crossref
-RUN cd /tmp && \
+    rm -rf "$BASE" && \
+    # pandoc-crossref
     if [ ! -f packages/pandoc-crossref-Linux-X64.tar.xz ]; then \
-        curl -L -o packages/pandoc-crossref-Linux-X64.tar.xz https://github.com/lierdakil/pandoc-crossref/releases/download/v0.3.20/pandoc-crossref-Linux-X64.tar.xz; \
+        curl -L -o /tmp/pandoc-crossref-Linux-X64.tar.xz https://github.com/lierdakil/pandoc-crossref/releases/download/v0.3.20/pandoc-crossref-Linux-X64.tar.xz; \
+    else \
+        cp packages/pandoc-crossref-Linux-X64.tar.xz /tmp/; \
     fi && \
-    tar xfJ packages/pandoc-crossref-Linux-X64.tar.xz && \
+    tar xfJ pandoc-crossref-Linux-X64.tar.xz && \
     gzip -9n pandoc-crossref.1 && \
     install -d /usr/local/bin /usr/local/share/man/man1 && \
     install -m 0755 "pandoc-crossref" /usr/local/bin/pandoc-crossref && \
     install -m 0644 "pandoc-crossref.1.gz" /usr/local/share/man/man1/pandoc-crossref.1.gz && \
-    rm -rf /tmp/pandoc-crossref /tmp/pandoc-crossref pandoc-crossref.1.gz
-
-# googletest
-RUN cd /tmp && \
+    rm -f pandoc-crossref pandoc-crossref.1.gz && \
+    # googletest
     if [ ! -f packages/googletest-1.17.0.el8.x86_64.tar.gz ]; then \
-        curl -L -o packages/googletest-1.17.0.el8.x86_64.tar.gz https://github.com/Hondarer/googletest.el8.x86_64/releases/download/v1.17.0/googletest-1.17.0.el8.x86_64.tar.gz; \
+        curl -L -o /tmp/googletest-1.17.0.el8.x86_64.tar.gz https://github.com/Hondarer/googletest.el8.x86_64/releases/download/v1.17.0/googletest-1.17.0.el8.x86_64.tar.gz; \
+    else \
+        cp packages/googletest-1.17.0.el8.x86_64.tar.gz /tmp/; \
     fi && \
-    cd / && tar xfz /tmp/packages/googletest-1.17.0.el8.x86_64.tar.gz
-
-# plantuml
-RUN cd /tmp && \
+    cd / && tar xfz /tmp/googletest-1.17.0.el8.x86_64.tar.gz && \
+    # plantuml
+    cd /tmp && \
     if [ ! -f packages/plantuml-1.2025.4.jar ]; then \
-        curl -L -o packages/plantuml-1.2025.4.jar https://github.com/plantuml/plantuml/releases/download/v1.2025.4/plantuml-1.2025.4.jar; \
+        curl -L -o /tmp/plantuml-1.2025.4.jar https://github.com/plantuml/plantuml/releases/download/v1.2025.4/plantuml-1.2025.4.jar; \
+    else \
+        cp packages/plantuml-1.2025.4.jar /tmp/; \
     fi && \
-    chown root:root packages/plantuml-1.2025.4.jar && \
-    cp packages/plantuml-1.2025.4.jar /usr/local/bin/ && \
+    chown root:root plantuml-1.2025.4.jar && \
+    chmod 0755 plantuml-1.2025.4.jar && \
+    cp plantuml-1.2025.4.jar /usr/local/bin/ && \
     cd /usr/local/bin && ln -s plantuml-1.2025.4.jar plantuml.jar && \
     echo -e "#!/bin/bash" > /usr/local/bin/plantuml && \
     echo -e "export LANG=ja_JP.UTF-8" >> /usr/local/bin/plantuml && \
     echo -e "/usr/bin/java -Djava.io.tmpdir=/var/tmp -Djava.awt.headless=true -jar /usr/local/bin/plantuml.jar -charset UTF-8 \"\$@\"" >> /usr/local/bin/plantuml && \
-    chmod 0755 /usr/local/bin/plantuml
+    chmod 0755 /usr/local/bin/plantuml && \
+    # clean up
+    rm -f /tmp/*.tar.* /tmp/*.jar
 
 # mandb
 RUN echo "Processing manual pages with mandb..."; \
