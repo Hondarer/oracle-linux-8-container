@@ -1,5 +1,3 @@
-# syntax=docker/dockerfile:1
-
 FROM oraclelinux:8
 
 # ポート 22 を公開する宣言

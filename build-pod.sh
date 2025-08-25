@@ -26,7 +26,7 @@ fi
 # container-release の作成
 echo "Build on $(LANG=C && date)" > ./src/container-release
 
-echo "Building portable container image..."
+echo "Building container image..."
 
 # 既存のコンテナを停止
 source ./stop-pod.sh
