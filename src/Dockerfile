@@ -207,6 +207,9 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     echo -e "export LANG=ja_JP.UTF-8" >> /usr/local/bin/plantuml && \
     echo -e "/usr/bin/java -Djava.io.tmpdir=/var/tmp -Djava.awt.headless=true -jar /usr/local/bin/plantuml.jar -charset UTF-8 \"\$@\"" >> /usr/local/bin/plantuml && \
     chmod 0755 /usr/local/bin/plantuml && \
+    echo -e "#!/bin/bash" > /etc/profile.d/plantuml.sh && \
+    echo -e "export PLANTUML_HOME=/usr/local/bin" >> /etc/profile.d/plantuml.sh && \
+    chmod 0644 /etc/profile.d/plantuml.sh && \
     # clean up
     rm -f /tmp/*.tar.* /tmp/*.jar
 
