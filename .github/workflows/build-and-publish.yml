@@ -75,9 +75,40 @@ jobs:
 
       - name: Test container image
         run: |
-          # コンテナが正常に起動するかテスト
-          podman run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
-            /bin/bash -c "node --version && java --version && python --version"
+          # コンテナをバックグラウンドで起動
+          CONTAINER_ID=$(podman run -d \
+            -e HOST_USER=testuser \
+            -e HOST_UID=1000 \
+            -e HOST_GID=1000 \
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }})
+
+          # entrypoint.sh の処理完了を待つ
+          sleep 5
+
+          # コンテナ内でバージョン確認
+          echo "=== Node.js version ==="
+          podman exec $CONTAINER_ID node --version
+
+          echo "=== Java version ==="
+          podman exec $CONTAINER_ID java --version
+
+          echo "=== Python version ==="
+          podman exec $CONTAINER_ID python --version
+
+          echo "=== Doxygen version ==="
+          podman exec $CONTAINER_ID doxygen --version
+
+          echo "=== PlantUML version ==="
+          podman exec $CONTAINER_ID plantuml -version
+
+          # sshd が起動しているか確認
+          echo "=== Checking sshd process ==="
+          podman exec $CONTAINER_ID pgrep sshd
+          echo "sshd is running"
+
+          # クリーンアップ
+          podman stop $CONTAINER_ID
+          podman rm $CONTAINER_ID
 
       - name: Push container image
         if: github.event_name != 'pull_request'
