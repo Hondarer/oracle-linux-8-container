@@ -60,6 +60,11 @@ jobs:
 
       - name: Build container image
         run: |
+          # 必要なディレクトリを作成
+          mkdir -p src/keys src/packages src/fonts
+          # container-release の作成
+          echo "Build on $(date)" > src/container-release
+
           cd src
           podman build \
             --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
