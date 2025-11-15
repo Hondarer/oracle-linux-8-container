@@ -23,9 +23,9 @@ RUN echo "Listing users with UID >= 1000:"; \
         groupdel "$group" 2>/dev/null || true; \
     done
 
-# パッケージの更新とインストール
-RUN dnf update -y && \
-    dnf install -y \
+# パッケージのインストール
+# dnf update -y は、ベースイメージが最新の場合、ビルド時間を増やすだけであり不要。
+RUN dnf install -y \
         oracle-epel-release-el8 \
         dnf-plugins-core && \
     dnf config-manager --enable \
@@ -133,7 +133,7 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     cd /tmp && \
     # man-pages-ja
     if [ ! -f packages/man-pages-ja-20231115.tar.gz ]; then \
-        curl -o /tmp/man-pages-ja-20231115.tar.gz https://linuxjm.sourceforge.io/man-pages-ja-20231115.tar.gz; \
+        curl -fsSL -o /tmp/man-pages-ja-20231115.tar.gz https://linuxjm.sourceforge.io/man-pages-ja-20231115.tar.gz; \
     else \
         cp packages/man-pages-ja-20231115.tar.gz /tmp/; \
     fi && \
@@ -145,7 +145,7 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     cd /tmp && rm -rf man-pages-ja-20231115 && \
     # doxybook2
     if [ ! -f packages/doxybook2.el8.x86_64-1.6.1.tar.gz ]; then \
-        curl -L -o /tmp/doxybook2.el8.x86_64-1.6.1.tar.gz https://github.com/Hondarer/doxybook2.el8.x86_64/archive/refs/tags/v1.6.1.tar.gz; \
+        curl -fsSL -o /tmp/doxybook2.el8.x86_64-1.6.1.tar.gz https://github.com/Hondarer/doxybook2.el8.x86_64/archive/refs/tags/v1.6.1.tar.gz; \
     else \
         cp packages/doxybook2.el8.x86_64-1.6.1.tar.gz /tmp/; \
     fi && \
@@ -157,7 +157,7 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     rm -rf doxybook2.el8.x86_64-1.6.1 && \
     # pandoc
     if [ ! -f packages/pandoc-3.7.0.2-linux-amd64.tar.gz ]; then \
-        curl -L -o /tmp/pandoc-3.7.0.2-linux-amd64.tar.gz https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-linux-amd64.tar.gz; \
+        curl -fsSL -o /tmp/pandoc-3.7.0.2-linux-amd64.tar.gz https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-linux-amd64.tar.gz; \
     else \
         cp packages/pandoc-3.7.0.2-linux-amd64.tar.gz /tmp/; \
     fi && \
@@ -173,7 +173,7 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     rm -rf "$BASE" && \
     # pandoc-crossref
     if [ ! -f packages/pandoc-crossref-Linux-X64.tar.xz ]; then \
-        curl -L -o /tmp/pandoc-crossref-Linux-X64.tar.xz https://github.com/lierdakil/pandoc-crossref/releases/download/v0.3.20/pandoc-crossref-Linux-X64.tar.xz; \
+        curl -fsSL -o /tmp/pandoc-crossref-Linux-X64.tar.xz https://github.com/lierdakil/pandoc-crossref/releases/download/v0.3.20/pandoc-crossref-Linux-X64.tar.xz; \
     else \
         cp packages/pandoc-crossref-Linux-X64.tar.xz /tmp/; \
     fi && \
@@ -185,18 +185,19 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     rm -f pandoc-crossref pandoc-crossref.1.gz && \
     # googletest
     if [ ! -f packages/googletest-lib-1.17.0.tar.gz ]; then \
-        curl -L -o /tmp/googletest-lib-1.17.0.tar.gz https://github.com/Hondarer/googletest-lib/archive/refs/tags/v1.17.0.tar.gz; \
+        curl -fsSL -o /tmp/googletest-lib-1.17.0.tar.gz https://github.com/Hondarer/googletest-lib/archive/refs/tags/v1.17.0.tar.gz; \
     else \
         cp packages/googletest-lib-1.17.0.tar.gz /tmp/; \
     fi && \
     cd /tmp && tar xfz /tmp/googletest-lib-1.17.0.tar.gz && \
-    chmod -R 0755 googletest-lib-1.17.0 && find googletest-lib-1.17.0 -type f -exec chmod 644 {} + && \
+    find googletest-lib-1.17.0 -type d -exec chmod 0755 {} + && \
+    find googletest-lib-1.17.0 -type f -exec chmod 0644 {} + && \
     cd googletest-lib-1.17.0/include && cp -rp * /usr/local/include/. && \
     cd ../lib/linux/x86_64/gcc/release && cp -rp * /usr/local/lib64/. && \
     # plantuml
     cd /tmp && \
     if [ ! -f packages/plantuml-1.2025.4.jar ]; then \
-        curl -L -o /tmp/plantuml-1.2025.4.jar https://github.com/plantuml/plantuml/releases/download/v1.2025.4/plantuml-1.2025.4.jar; \
+        curl -fsSL -o /tmp/plantuml-1.2025.4.jar https://github.com/plantuml/plantuml/releases/download/v1.2025.4/plantuml-1.2025.4.jar; \
     else \
         cp packages/plantuml-1.2025.4.jar /tmp/; \
     fi && \
@@ -204,17 +205,21 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     chmod 0755 plantuml-1.2025.4.jar && \
     cp plantuml-1.2025.4.jar /usr/local/bin/ && \
     cd /usr/local/bin && ln -s plantuml-1.2025.4.jar plantuml.jar && \
-    echo -e "#!/bin/bash" > /usr/local/bin/plantuml && \
-    echo -e "export LANG=ja_JP.UTF-8" >> /usr/local/bin/plantuml && \
-    echo -e "/usr/bin/java -Djava.io.tmpdir=/var/tmp -Djava.awt.headless=true -jar /usr/local/bin/plantuml.jar -charset UTF-8 \"\$@\"" >> /usr/local/bin/plantuml && \
+    cat > /usr/local/bin/plantuml <<'EOF'
+#!/bin/bash
+export LANG=ja_JP.UTF-8
+/usr/bin/java -Djava.io.tmpdir=/var/tmp -Djava.awt.headless=true -jar /usr/local/bin/plantuml.jar -charset UTF-8 "$@"
+EOF
     chmod 0755 /usr/local/bin/plantuml && \
-    echo -e "#!/bin/bash" > /etc/profile.d/plantuml.sh && \
-    echo -e "export PLANTUML_HOME=/usr/local/bin" >> /etc/profile.d/plantuml.sh && \
+    cat > /etc/profile.d/plantuml.sh <<'EOF'
+#!/bin/bash
+export PLANTUML_HOME=/usr/local/bin
+EOF
     chmod 0644 /etc/profile.d/plantuml.sh && \
     # doxygen
     cd /tmp && \
     if [ ! -f packages/doxygen-1.14.0.src.tar.gz ]; then \
-        curl -L -o /tmp/doxygen-1.14.0.src.tar.gz https://doxygen.nl/files/doxygen-1.14.0.src.tar.gz; \
+        curl -fsSL -o /tmp/doxygen-1.14.0.src.tar.gz https://doxygen.nl/files/doxygen-1.14.0.src.tar.gz; \
     else \
         cp packages/doxygen-1.14.0.src.tar.gz /tmp/; \
     fi && \
