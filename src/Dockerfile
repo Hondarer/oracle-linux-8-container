@@ -42,15 +42,13 @@ RUN dnf update -y && \
         bc \
         binutils-devel \
         cairo-gobject \
+        cmake \
         colord-libs \
         dconf \
         dejavu-fonts-common \
         dejavu-sans-mono-fonts \
         desktop-file-utils \
         dotnet-sdk-9.0 \
-        doxygen-doxywizard.x86_64 \
-        doxygen-latex.x86_64 \
-        doxygen.x86_64 \
         expect \
         glib-networking \
         glibc-langpack-ja \
@@ -186,12 +184,15 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     install -m 0644 "pandoc-crossref.1.gz" /usr/local/share/man/man1/pandoc-crossref.1.gz && \
     rm -f pandoc-crossref pandoc-crossref.1.gz && \
     # googletest
-    if [ ! -f packages/googletest-1.17.0.el8.x86_64.tar.gz ]; then \
-        curl -L -o /tmp/googletest-1.17.0.el8.x86_64.tar.gz https://github.com/Hondarer/googletest.el8.x86_64/releases/download/v1.17.0/googletest-1.17.0.el8.x86_64.tar.gz; \
+    if [ ! -f packages/googletest-lib-1.17.0.tar.gz ]; then \
+        curl -L -o /tmp/googletest-lib-1.17.0.tar.gz https://github.com/Hondarer/googletest-lib/archive/refs/tags/v1.17.0.tar.gz; \
     else \
-        cp packages/googletest-1.17.0.el8.x86_64.tar.gz /tmp/; \
+        cp packages/googletest-lib-1.17.0.tar.gz /tmp/; \
     fi && \
-    cd / && tar xfz /tmp/googletest-1.17.0.el8.x86_64.tar.gz && \
+    cd /tmp && tar xfz /tmp/googletest-lib-1.17.0.tar.gz && \
+    chmod -R 0755 googletest-lib-1.17.0 && find googletest-lib-1.17.0 -type f -exec chmod 644 {} + && \
+    cd googletest-lib-1.17.0/include && cp -rp * /usr/local/include/. && \
+    cd ../lib/linux/x86_64/gcc/release && cp -rp * /usr/local/lib64/. && \
     # plantuml
     cd /tmp && \
     if [ ! -f packages/plantuml-1.2025.4.jar ]; then \
@@ -210,6 +211,26 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     echo -e "#!/bin/bash" > /etc/profile.d/plantuml.sh && \
     echo -e "export PLANTUML_HOME=/usr/local/bin" >> /etc/profile.d/plantuml.sh && \
     chmod 0644 /etc/profile.d/plantuml.sh && \
+    # doxygen
+    cd /tmp && \
+    if [ ! -f packages/doxygen-1.14.0.src.tar.gz ]; then \
+        curl -L -o /tmp/doxygen-1.14.0.src.tar.gz https://doxygen.nl/files/doxygen-1.14.0.src.tar.gz; \
+    else \
+        cp packages/doxygen-1.14.0.src.tar.gz /tmp/; \
+    fi && \
+    tar xfz doxygen-1.14.0.src.tar.gz && \
+    cd doxygen-1.14.0 && \
+    mkdir build && \
+    cd build && \
+    cmake -G "Unix Makefiles" \
+        -D CMAKE_BUILD_TYPE=Release \
+        -D CMAKE_INSTALL_PREFIX=/usr/local \
+        -D build_wizard=OFF \
+        -W no-dev .. && \
+    make -j"$(nproc)" && \
+    make install && \
+    cd /tmp && \
+    rm -rf doxygen-1.14.0 && \
     # clean up
     rm -f /tmp/*.tar.* /tmp/*.jar
 
