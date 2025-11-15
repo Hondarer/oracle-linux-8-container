@@ -235,7 +235,9 @@ podman system prune -f
 - **.NET 9.0**: MIT License
 - **Python 3.11**: PSF License
 - **Doxygen**: GPL-2.0
-- **PlantUML**: GPL-3.0
+- **PlantUML**: GPL-3.0+
 - **Pandoc**: GPL-2.0+
 
-詳細なコンポーネントリストとライセンス情報は [src/NOTICE](./src/NOTICE) を参照してください。
+詳細なコンポーネントリストとライセンス情報は以下を参照してください：
+- [THIRD_PARTY_LICENSES.md](./THIRD_PARTY_LICENSES.md) - 包括的なライセンス情報（推奨）
+- [src/NOTICE](./src/NOTICE) - コンテナイメージに含まれるサードパーティコンポーネント一覧

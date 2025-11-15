@@ -3,7 +3,7 @@ FROM oraclelinux:8
 # メタデータラベル
 LABEL org.opencontainers.image.title="Oracle Linux 8 Development Container"
 LABEL org.opencontainers.image.description="Oracle Linux 8 based development container with Node.js, Java, .NET, Python, Doxygen, PlantUML, and other development tools"
-LABEL org.opencontainers.image.licenses="GPL-2.0"
+LABEL org.opencontainers.image.licenses="GPL-2.0 AND MIT AND BSD-3-Clause AND PSF-2.0 AND OFL-1.1"
 LABEL org.opencontainers.image.vendor="Oracle America, Inc."
 LABEL org.opencontainers.image.base.name="oraclelinux:8"
 

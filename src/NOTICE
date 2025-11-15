@@ -91,6 +91,15 @@ Copyright: gcovr authors
 URL: https://gcovr.com/
 
 ================================================================================
+PYTHON PACKAGES
+================================================================================
+
+hjson
+License: MIT License
+Copyright: Christian Zangl
+URL: https://github.com/hjson/hjson-py
+
+================================================================================
 UTILITIES AND LIBRARIES
 ================================================================================
 
@@ -113,6 +122,21 @@ expect
 License: Public Domain
 Copyright: Don Libes, NIST
 URL: https://core.tcl-lang.org/expect/
+
+lsof
+License: Custom permissive license
+Copyright: Purdue University
+URL: https://github.com/lsof-org/lsof
+
+unzip
+License: Info-ZIP License (BSD-like)
+Copyright: Info-ZIP group
+URL: http://www.info-zip.org/
+
+nkf (Network Kanji Filter)
+License: BSD-like License
+Copyright: Itaru Ichikawa
+URL: https://osdn.net/projects/nkf/
 
 ================================================================================
 FONTS
@@ -138,14 +162,21 @@ License: Bitstream Vera Fonts Copyright + Arev Fonts License
 Copyright: DejaVu fonts team
 URL: https://dejavu-fonts.github.io/
 
+UDEV Gothic HSRF 2.1.0
+License: SIL Open Font License 1.1
+Copyright: Original by yuru7, HSRF variant by Hondarer
+URL: https://github.com/Hondarer/udev-gothic-rf
+Original: https://github.com/yuru7/udev-gothic
+
 ================================================================================
 JAPANESE LANGUAGE SUPPORT
 ================================================================================
 
-man-pages-ja (Japanese Manual Pages)
+man-pages-ja (Japanese Manual Pages) 20251115
 License: Various (GPL, BSD, MIT, and others)
-Copyright: JM Project
-URL: https://linuxjm.sourceforge.io/
+Copyright: JM Project (Japanese Manual Project)
+URL: https://linuxjm.osdn.jp/
+GitHub: https://github.com/linux-jm/manual
 
 ================================================================================
 ADDITIONAL NOTICES
@@ -163,6 +194,40 @@ For complete license texts and source code, please refer to:
 If you distribute this container image, you must comply with the license terms
 of all included components, particularly the GPL-2.0 requirements for providing
 source code access.
+
+================================================================================
+GRAPHICS AND DESKTOP LIBRARIES
+================================================================================
+
+These libraries are installed as dependencies for graphical tools like PlantUML
+and Doxygen.
+
+GTK3
+License: GNU Lesser General Public License v2.1 (LGPL-2.1)
+Copyright: The GTK Team
+URL: https://www.gtk.org/
+
+Mesa (Vulkan drivers)
+License: MIT License and others
+Copyright: Mesa3D contributors
+URL: https://www.mesa3d.org/
+
+X11 Libraries
+License: MIT License
+Copyright: X.Org Foundation
+URL: https://www.x.org/
+
+Wayland
+License: MIT License
+Copyright: Wayland contributors
+URL: https://wayland.freedesktop.org/
+
+================================================================================
+ADDITIONAL NOTES
+================================================================================
+
+For a comprehensive and detailed list of all third-party components and their
+licenses, please refer to the THIRD_PARTY_LICENSES.md file in the project root.
 
 ================================================================================
 Last Updated: 2025-11-15
