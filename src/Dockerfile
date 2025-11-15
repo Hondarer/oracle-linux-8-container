@@ -1,5 +1,12 @@
 FROM oraclelinux:8
 
+# メタデータラベル
+LABEL org.opencontainers.image.title="Oracle Linux 8 Development Container"
+LABEL org.opencontainers.image.description="Oracle Linux 8 based development container with Node.js, Java, .NET, Python, Doxygen, PlantUML, and other development tools"
+LABEL org.opencontainers.image.licenses="GPL-2.0"
+LABEL org.opencontainers.image.vendor="Oracle America, Inc."
+LABEL org.opencontainers.image.base.name="oraclelinux:8"
+
 # ポート 22 を公開する宣言
 EXPOSE 22
 
@@ -100,6 +107,7 @@ RUN dnf install -y \
         sudo \
         sysstat \
         tree \
+        unzip \
         vlgothic-fonts \
         vulkan-loader \
         xdg-utils \
@@ -216,6 +224,23 @@ EOF
 export PLANTUML_HOME=/usr/local/bin
 EOF
     chmod 0644 /etc/profile.d/plantuml.sh && \
+    # UDEVGothic font
+    cd /tmp && \
+    if [ ! -f packages/UDEVGothic_HSRF_v2.1.0.zip ]; then \
+        curl -fsSL -o /tmp/UDEVGothic_HSRF_v2.1.0.zip https://github.com/Hondarer/udev-gothic-rf/releases/download/v2.1.0/UDEVGothic_HSRF_v2.1.0.zip; \
+    else \
+        cp packages/UDEVGothic_HSRF_v2.1.0.zip /tmp/; \
+    fi && \
+    unzip -q UDEVGothic_HSRF_v2.1.0.zip && \
+    mkdir -p /usr/share/fonts/udev-gothic && \
+    cp UDEVGothic_HSRF_v2.1.0/UDEVGothicHSRFJPDOC-Bold.ttf /usr/share/fonts/udev-gothic/ && \
+    cp UDEVGothic_HSRF_v2.1.0/UDEVGothicHSRFJPDOC-BoldItalic.ttf /usr/share/fonts/udev-gothic/ && \
+    cp UDEVGothic_HSRF_v2.1.0/UDEVGothicHSRFJPDOC-Italic.ttf /usr/share/fonts/udev-gothic/ && \
+    cp UDEVGothic_HSRF_v2.1.0/UDEVGothicHSRFJPDOC-Regular.ttf /usr/share/fonts/udev-gothic/ && \
+    chown root:root /usr/share/fonts/udev-gothic/*.ttf && \
+    chmod 0644 /usr/share/fonts/udev-gothic/*.ttf && \
+    fc-cache -fv > /dev/null 2>&1 && \
+    rm -rf UDEVGothic_HSRF_v2.1.0 && \
     # doxygen
     cd /tmp && \
     if [ ! -f packages/doxygen-1.14.0.src.tar.gz ]; then \
@@ -237,7 +262,7 @@ EOF
     cd /tmp && \
     rm -rf doxygen-1.14.0 && \
     # clean up
-    rm -f /tmp/*.tar.* /tmp/*.jar
+    rm -f /tmp/*.tar.* /tmp/*.jar /tmp/*.zip
 
 # mandb
 RUN echo "Processing manual pages with mandb..."; \

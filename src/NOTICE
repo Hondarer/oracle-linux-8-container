@@ -1,0 +1,169 @@
+NOTICE - Third-Party Components and Licenses
+
+This container image includes Oracle Linux and various open-source software components.
+Each component is licensed under its respective license terms as detailed below.
+
+================================================================================
+ORACLE LINUX
+================================================================================
+Oracle Linux 8
+License: GNU General Public License v2.0 (GPL-2.0)
+Copyright: Oracle America, Inc.
+Source: https://oss.oracle.com/sources/
+License File: See LICENSE-IMAGE in this directory
+
+================================================================================
+DEVELOPMENT TOOLS AND RUNTIME ENVIRONMENTS
+================================================================================
+
+Node.js 22
+License: MIT License
+Copyright: OpenJS Foundation and contributors
+URL: https://github.com/nodejs/node
+
+Java (OpenJDK) 17
+License: GNU General Public License v2.0 with Classpath Exception
+Copyright: Oracle Corporation and/or its affiliates
+URL: https://openjdk.java.net/
+
+.NET SDK 9.0
+License: MIT License
+Copyright: .NET Foundation and Contributors
+URL: https://github.com/dotnet/runtime
+
+Python 3.11
+License: Python Software Foundation License (PSF)
+Copyright: Python Software Foundation
+URL: https://www.python.org/
+
+GCC (GNU Compiler Collection)
+License: GNU General Public License v3.0 (GPL-3.0)
+Copyright: Free Software Foundation, Inc.
+URL: https://gcc.gnu.org/
+
+CMake
+License: BSD 3-Clause License
+Copyright: Kitware, Inc.
+URL: https://cmake.org/
+
+================================================================================
+DOCUMENTATION AND DIAGRAM TOOLS
+================================================================================
+
+Doxygen 1.14.0
+License: GNU General Public License v2.0 (GPL-2.0)
+Copyright: Dimitri van Heesch
+URL: https://www.doxygen.nl/
+Source: https://doxygen.nl/files/doxygen-1.14.0.src.tar.gz
+
+doxybook2 1.6.1
+License: MIT License
+Copyright: Contributors
+URL: https://github.com/Hondarer/doxybook2.el8.x86_64
+
+PlantUML 1.2025.4
+License: GNU General Public License v3.0 (GPL-3.0)
+Copyright: PlantUML Contributors
+URL: https://plantuml.com/
+
+Pandoc 3.7.0.2
+License: GNU General Public License v2.0 or later (GPL-2.0+)
+Copyright: John MacFarlane
+URL: https://pandoc.org/
+
+pandoc-crossref 0.3.20
+License: GNU General Public License v2.0 or later (GPL-2.0+)
+Copyright: Nikolay Yakimov
+URL: https://github.com/lierdakil/pandoc-crossref
+
+================================================================================
+TESTING FRAMEWORKS
+================================================================================
+
+Google Test (GoogleTest) 1.17.0
+License: BSD 3-Clause License
+Copyright: Google Inc.
+URL: https://github.com/google/googletest
+
+gcovr
+License: BSD 3-Clause License
+Copyright: gcovr authors
+URL: https://gcovr.com/
+
+================================================================================
+UTILITIES AND LIBRARIES
+================================================================================
+
+jq
+License: MIT License
+Copyright: Stephen Dolan
+URL: https://stedolan.github.io/jq/
+
+rsync
+License: GNU General Public License v3.0 (GPL-3.0)
+Copyright: Andrew Tridgell and Paul Mackerras
+URL: https://rsync.samba.org/
+
+tree
+License: GNU General Public License v2.0 (GPL-2.0)
+Copyright: Steve Baker
+URL: http://mama.indstate.edu/users/ice/tree/
+
+expect
+License: Public Domain
+Copyright: Don Libes, NIST
+URL: https://core.tcl-lang.org/expect/
+
+================================================================================
+FONTS
+================================================================================
+
+VL Gothic Fonts
+License: BSD-like License (mplus-derived)
+Copyright: Project Vine / Daisuke SUZUKI
+URL: http://vlgothic.dicey.org/
+
+Liberation Fonts
+License: SIL Open Font License 1.1
+Copyright: Red Hat, Inc.
+URL: https://github.com/liberationfonts/liberation-fonts
+
+Cantarell Fonts
+License: SIL Open Font License 1.1
+Copyright: Abattis Fonts Project
+URL: https://gitlab.gnome.org/GNOME/cantarell-fonts
+
+DejaVu Fonts
+License: Bitstream Vera Fonts Copyright + Arev Fonts License
+Copyright: DejaVu fonts team
+URL: https://dejavu-fonts.github.io/
+
+================================================================================
+JAPANESE LANGUAGE SUPPORT
+================================================================================
+
+man-pages-ja (Japanese Manual Pages)
+License: Various (GPL, BSD, MIT, and others)
+Copyright: JM Project
+URL: https://linuxjm.sourceforge.io/
+
+================================================================================
+ADDITIONAL NOTICES
+================================================================================
+
+This container image is built from multiple open-source components. The licenses
+listed above apply to the respective components. The overall container image is
+distributed under the GNU General Public License v2.0 (GPL-2.0) as specified in
+the LICENSE-IMAGE file.
+
+For complete license texts and source code, please refer to:
+- Oracle Linux sources: https://oss.oracle.com/sources/
+- Individual component project URLs listed above
+
+If you distribute this container image, you must comply with the license terms
+of all included components, particularly the GPL-2.0 requirements for providing
+source code access.
+
+================================================================================
+Last Updated: 2025-11-15
+================================================================================

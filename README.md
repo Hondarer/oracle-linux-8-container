@@ -197,10 +197,45 @@ podman system prune -f
 
 ## 関連ドキュメント
 
+### プロジェクトドキュメント
+
+- [docs-src/](docs-src/) - 追加ドキュメント
+  - [GitHub Container Registry への公開ガイド](docs-src/publishing-to-github.md)
 - [CLAUDE.md](CLAUDE.md) - Claude Code を使用する際の詳細ガイド
+
+### 外部リンク
+
 - [Oracle Linux 8 公式ドキュメント](https://docs.oracle.com/en/operating-systems/oracle-linux/8/)
 - [Podman 公式ドキュメント](https://podman.io/docs)
 
 ## ライセンス
 
-[LICENSE](./LICENSE) を参照してください。
+このプロジェクトは、デュアルライセンス構造を採用しています。
+
+### プロジェクトスクリプトおよびドキュメント
+
+- **ライセンス**: MIT License
+- **適用範囲**: ビルドスクリプト (build-pod.sh、start-pod.sh など)、ドキュメント、設定ファイル
+- **詳細**: [LICENSE](./LICENSE) を参照してください
+
+### コンテナイメージ
+
+- **ライセンス**: GNU General Public License v2.0 (GPL-2.0)
+- **適用範囲**: ビルドされるコンテナイメージとその内容
+- **詳細**: [src/LICENSE-IMAGE](./src/LICENSE-IMAGE) を参照してください
+- **含まれるコンポーネント**: [src/NOTICE](./src/NOTICE) を参照してください
+
+コンテナイメージは Oracle Linux (GPL-2.0) をベースとしており、多数のオープンソースコンポーネントを含んでいます。イメージを再配布する場合は、GPL-2.0 のライセンス条項に従う必要があります。
+
+### 主要コンポーネントのライセンス
+
+- **Oracle Linux 8**: GPL-2.0
+- **OpenJDK 17**: GPL-2.0 with Classpath Exception
+- **Node.js 22**: MIT License
+- **.NET 9.0**: MIT License
+- **Python 3.11**: PSF License
+- **Doxygen**: GPL-2.0
+- **PlantUML**: GPL-3.0
+- **Pandoc**: GPL-2.0+
+
+詳細なコンポーネントリストとライセンス情報は [src/NOTICE](./src/NOTICE) を参照してください。
