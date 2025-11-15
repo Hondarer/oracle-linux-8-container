@@ -12,6 +12,15 @@
   - イメージの利用方法
   - トラブルシューティング
 
+### CI/CD での利用
+
+- [CI/CD でのコンテナイメージ利用ガイド](./using-in-cicd.md)
+  - 他のリポジトリの CI/CD パイプラインでの利用方法
+  - GitHub Actions での実践例 (C++, Node.js, Java, Python, .NET)
+  - コンテナでのビルド・テスト実行方法
+  - 高度な設定とベストプラクティス
+  - トラブルシューティング
+
 ## GitHub Actions ワークフロー
 
 実際に使用できる GitHub Actions ワークフローファイルは、プロジェクトルートの `.github/workflows/` ディレクトリに配置されています。

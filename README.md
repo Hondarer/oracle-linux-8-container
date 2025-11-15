@@ -201,6 +201,7 @@ podman system prune -f
 
 - [docs-src/](docs-src/) - 追加ドキュメント
   - [GitHub Container Registry への公開ガイド](docs-src/publishing-to-github.md)
+  - [CI/CD でのコンテナイメージ利用ガイド](docs-src/using-in-cicd.md)
 - [CLAUDE.md](CLAUDE.md) - Claude Code を使用する際の詳細ガイド
 
 ### 外部リンク
