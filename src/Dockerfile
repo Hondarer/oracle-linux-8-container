@@ -140,17 +140,17 @@ RUN --mount=type=bind,source=fonts,target=/tmp/fonts,readonly \
 RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     cd /tmp && \
     # man-pages-ja
-    if [ ! -f packages/man-pages-ja-20231115.tar.gz ]; then \
-        curl -fsSL -o /tmp/man-pages-ja-20231115.tar.gz https://linuxjm.sourceforge.io/man-pages-ja-20231115.tar.gz; \
+    if [ ! -f packages/man-pages-ja-20251115.tar.gz ]; then \
+        curl -fsSL -o /tmp/man-pages-ja-20251115.tar.gz https://github.com/linux-jm/manual/releases/download/v20251115/man-pages-ja-20251115.tar.gz; \
     else \
-        cp packages/man-pages-ja-20231115.tar.gz /tmp/; \
+        cp packages/man-pages-ja-20251115.tar.gz /tmp/; \
     fi && \
-    tar xzf man-pages-ja-20231115.tar.gz && \
-    cd man-pages-ja-20231115 && \
+    tar xzf man-pages-ja-20251115.tar.gz && \
+    cd man-pages-ja-20251115 && \
     if [ -f /tmp/packages/man-pages-ja-auto-installer.sh ]; then \
         sh /tmp/packages/man-pages-ja-auto-installer.sh; \
     fi && \
-    cd /tmp && rm -rf man-pages-ja-20231115 && \
+    cd /tmp && rm -rf man-pages-ja-20251115 && \
     # doxybook2
     if [ ! -f packages/doxybook2.el8.x86_64-1.6.1.tar.gz ]; then \
         curl -fsSL -o /tmp/doxybook2.el8.x86_64-1.6.1.tar.gz https://github.com/Hondarer/doxybook2.el8.x86_64/archive/refs/tags/v1.6.1.tar.gz; \
@@ -213,16 +213,12 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     chmod 0755 plantuml-1.2025.4.jar && \
     cp plantuml-1.2025.4.jar /usr/local/bin/ && \
     cd /usr/local/bin && ln -s plantuml-1.2025.4.jar plantuml.jar && \
-    cat > /usr/local/bin/plantuml <<'EOF'
-#!/bin/bash
-export LANG=ja_JP.UTF-8
-/usr/bin/java -Djava.io.tmpdir=/var/tmp -Djava.awt.headless=true -jar /usr/local/bin/plantuml.jar -charset UTF-8 "$@"
-EOF
+    echo '#!/bin/bash' > /usr/local/bin/plantuml && \
+    echo 'export LANG=ja_JP.UTF-8' >> /usr/local/bin/plantuml && \
+    echo '/usr/bin/java -Djava.io.tmpdir=/var/tmp -Djava.awt.headless=true -jar /usr/local/bin/plantuml.jar -charset UTF-8 "$@"' >> /usr/local/bin/plantuml && \
     chmod 0755 /usr/local/bin/plantuml && \
-    cat > /etc/profile.d/plantuml.sh <<'EOF'
-#!/bin/bash
-export PLANTUML_HOME=/usr/local/bin
-EOF
+    echo '#!/bin/bash' > /etc/profile.d/plantuml.sh && \
+    echo 'export PLANTUML_HOME=/usr/local/bin' >> /etc/profile.d/plantuml.sh && \
     chmod 0644 /etc/profile.d/plantuml.sh && \
     # UDEVGothic font
     cd /tmp && \
