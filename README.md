@@ -200,8 +200,9 @@ podman system prune -f
 ### プロジェクトドキュメント
 
 - [docs-src/](docs-src/) - 追加ドキュメント
-  - [GitHub Container Registry への公開ガイド](docs-src/publishing-to-github.md)
-  - [CI/CD でのコンテナイメージ利用ガイド](docs-src/using-in-cicd.md)
+  - [GitHub Container Registry への公開ガイド](docs-src/publishing-to-github.md) - イメージの公開方法
+  - [CI/CD でのコンテナイメージ利用ガイド](docs-src/using-in-cicd/) - 他のプロジェクトでの利用方法
+    - 言語別サンプル: [C/C++](docs-src/using-in-cicd/cpp-example.md)、[Node.js](docs-src/using-in-cicd/nodejs-example.md)、[Java](docs-src/using-in-cicd/java-example.md)、[Python](docs-src/using-in-cicd/python-example.md)、[.NET](docs-src/using-in-cicd/dotnet-example.md)
 - [CLAUDE.md](CLAUDE.md) - Claude Code を使用する際の詳細ガイド
 
 ### 外部リンク
