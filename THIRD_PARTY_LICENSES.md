@@ -129,8 +129,7 @@
 ### man-pages-ja (日本語マニュアルページ)
 - **バージョン**: 20251115
 - **ライセンス**: BSD License, GPLv2, and other free licenses
-- **URL**: https://linuxjm.osdn.jp/
-- **GitHub**: https://github.com/linux-jm/manual
+- **URL**: https://github.com/linux-jm/manual
 - **説明**: Linux マニュアルページの日本語翻訳
 
 ## 開発ツールとユーティリティ

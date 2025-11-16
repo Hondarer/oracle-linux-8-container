@@ -4,6 +4,14 @@
 
 ## 目次
 
+### コンテナイメージの管理
+
+- [コンテナイメージのタグ戦略](./tagging-strategy.md)
+  - タグ命名規則 (vYYYYMMDD.MINOR.PATCH)
+  - latest タグの動作
+  - バージョニング戦略
+  - リリースフロー
+
 ### コンテナイメージの公開
 
 - [GitHub Container Registry への公開ガイド](./publishing-to-github.md)

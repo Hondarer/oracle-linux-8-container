@@ -52,18 +52,47 @@ jobs:
           tags: |
             type=ref,event=branch
             type=ref,event=pr
+            type=ref,event=tag
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
             type=sha,format=short
-            type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Build container image
         run: |
           # 必要なディレクトリを作成
           mkdir -p src/keys src/packages src/fonts
+
           # container-release の作成
-          echo "Build on $(date)" > src/container-release
+          {
+            echo "# Container Build Information"
+            printf "%-18s = %s\n" "BUILD_TYPE" "github-actions"
+            printf "%-18s = %s\n" "BUILD_DATE" "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            printf "%-18s = %s\n" "BUILD_HOST" "$(uname -n 2>/dev/null || echo 'github-runner')"
+
+            # Git コミットハッシュと変更状態の取得
+            GIT_COMMIT="${{ github.sha }}"
+            git diff-index --quiet HEAD 2>/dev/null || GIT_COMMIT="${GIT_COMMIT}+"
+            printf "%-18s = %s\n" "GIT_COMMIT" "${GIT_COMMIT}"
+
+            printf "%-18s = %s\n" "GIT_BRANCH" "${{ github.ref_name }}"
+
+            # タグの取得とバージョン抽出
+            if [ "${{ github.ref_type }}" = "tag" ]; then
+              printf "%-18s = %s\n" "GIT_TAG" "${{ github.ref_name }}"
+              VERSION="${{ github.ref_name }}"
+              VERSION="${VERSION#v}"
+              printf "%-18s = %s\n" "VERSION" "${VERSION}"
+            else
+              printf "%-18s = %s\n" "GIT_TAG" "(none)"
+              printf "%-18s = %s\n" "VERSION" "dev"
+            fi
+
+            printf "%-18s = %s\n" "BUILDER" "${{ github.actor }}"
+            printf "%-18s = %s\n" "GITHUB_REPOSITORY" "${{ github.repository }}"
+            printf "%-18s = %s\n" "GITHUB_RUN_ID" "${{ github.run_id }}"
+            printf "%-18s = %s\n" "GITHUB_RUN_NUMBER" "${{ github.run_number }}"
+          } > src/container-release
 
           cd src
           podman build \
