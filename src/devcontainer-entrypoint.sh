@@ -5,6 +5,12 @@
 # このスクリプトは root 権限で実行されることを想定しています。
 #
 
+# root 権限チェック
+if [ "$(id -u)" -ne 0 ]; then
+    echo "Error: This script must be run as root" >&2
+    exit 1
+fi
+
 # 環境変数からユーザー情報を取得
 HOST_USER=${HOST_USER:-vscode}
 HOST_UID=${HOST_UID:-1000}
