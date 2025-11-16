@@ -20,6 +20,14 @@
   - イメージの利用方法
   - トラブルシューティング
 
+### VS Code Dev Container として利用
+
+- [VS Code Dev Container として使用する](./using-in-vscode/) - 概要とセットアップ手順
+  - クイックスタート
+  - 詳細な設定とカスタマイズ
+  - Docker と Podman の両方をサポート
+  - トラブルシューティング
+
 ### CI/CD での利用
 
 - [CI/CD でのコンテナイメージ利用ガイド](./using-in-cicd/) - 概要と目次

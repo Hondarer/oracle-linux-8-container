@@ -294,8 +294,11 @@ WORKDIR /workspace
 
 # エントリーポイント用スクリプトの配置
 ADD entrypoint.sh /usr/local/bin
+ADD devcontainer-entrypoint.sh /usr/local/bin
 RUN chown root:root /usr/local/bin/entrypoint.sh && \
-    chmod 0755 /usr/local/bin/entrypoint.sh
+    chmod 0755 /usr/local/bin/entrypoint.sh && \
+    chown root:root /usr/local/bin/devcontainer-entrypoint.sh && \
+    chmod 0755 /usr/local/bin/devcontainer-entrypoint.sh
 
 # エントリーポイントの設定
 ENTRYPOINT ["/bin/sh", "-c", "/usr/local/bin/entrypoint.sh 2>&1 | tee /var/log/entrypoint.log"]
