@@ -264,8 +264,7 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
 # システムワイドなキャッシュディレクトリを使用し、ローカルインストール時の再ダウンロードを回避
 ENV PUPPETEER_CACHE_DIR=/opt/puppeteer-cache
 RUN mkdir -p /opt/puppeteer-cache && \
-    npm install -g puppeteer && \
-    npx puppeteer browsers install chrome && \
+    PUPPETEER_SKIP_DOWNLOAD=false npm install -g puppeteer && \
     chmod -R 755 /opt/puppeteer-cache && \
     echo '#!/bin/bash' > /etc/profile.d/puppeteer.sh && \
     echo 'export PUPPETEER_CACHE_DIR=/opt/puppeteer-cache' >> /etc/profile.d/puppeteer.sh && \
