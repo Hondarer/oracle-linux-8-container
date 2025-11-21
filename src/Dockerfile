@@ -260,6 +260,14 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     # clean up
     rm -f /tmp/*.tar.* /tmp/*.jar /tmp/*.zip
 
+# Puppeteer と Chromium のインストール
+# システムワイドなキャッシュディレクトリを使用し、ローカルインストール時の再ダウンロードを回避
+ENV PUPPETEER_CACHE_DIR=/opt/puppeteer-cache
+RUN npm install -g puppeteer && \
+    mkdir -p /opt/puppeteer-cache && \
+    npx puppeteer browsers install chrome && \
+    chmod -R 755 /opt/puppeteer-cache
+
 # mandb
 RUN echo "Processing manual pages with mandb..."; \
     mandb > /dev/null 2>&1
