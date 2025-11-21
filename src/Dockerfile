@@ -13,6 +13,7 @@ EXPOSE 22
 # 環境変数を設定
 ENV PATH="/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 ENV SHELL="/bin/bash"
+ENV PLANTUML_HOME="/usr/local/bin"
 
 # UID:1000 以上のユーザーとグループの削除 (nobody は除外)
 RUN echo "Listing users with UID >= 1000:"; \
