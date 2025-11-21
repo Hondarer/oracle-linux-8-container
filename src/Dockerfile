@@ -266,7 +266,10 @@ ENV PUPPETEER_CACHE_DIR=/opt/puppeteer-cache
 RUN npm install -g puppeteer && \
     mkdir -p /opt/puppeteer-cache && \
     npx puppeteer browsers install chrome && \
-    chmod -R 755 /opt/puppeteer-cache
+    chmod -R 755 /opt/puppeteer-cache && \
+    echo '#!/bin/bash' > /etc/profile.d/puppeteer.sh && \
+    echo 'export PUPPETEER_CACHE_DIR=/opt/puppeteer-cache' >> /etc/profile.d/puppeteer.sh && \
+    chmod 0644 /etc/profile.d/puppeteer.sh
 
 # mandb
 RUN echo "Processing manual pages with mandb..."; \
