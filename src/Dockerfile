@@ -261,6 +261,16 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     # clean up
     rm -f /tmp/*.tar.* /tmp/*.jar /tmp/*.zip
 
+# Chromium のインストール
+# システムワイドなキャッシュディレクトリを使用し、ローカルインストール時の再ダウンロードを回避
+ENV PUPPETEER_CACHE_DIR=/opt/puppeteer-cache
+RUN mkdir -p /opt/puppeteer-cache && \
+    NPM_CONFIG_PREFIX= npx -y @puppeteer/browsers install chrome --path /opt/puppeteer-cache && \
+    chmod -R 755 /opt/puppeteer-cache && \
+    echo '#!/bin/bash' > /etc/profile.d/puppeteer.sh && \
+    echo 'export PUPPETEER_CACHE_DIR=/opt/puppeteer-cache' >> /etc/profile.d/puppeteer.sh && \
+    chmod 0644 /etc/profile.d/puppeteer.sh
+
 # mandb
 RUN echo "Processing manual pages with mandb..."; \
     mandb > /dev/null 2>&1
