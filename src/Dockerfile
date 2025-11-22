@@ -260,7 +260,7 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     # clean up
     rm -f /tmp/*.tar.* /tmp/*.jar /tmp/*.zip
 
-# Puppeteer と Chromium のインストール
+# Chromium のインストール
 # システムワイドなキャッシュディレクトリを使用し、ローカルインストール時の再ダウンロードを回避
 ENV PUPPETEER_CACHE_DIR=/opt/puppeteer-cache
 RUN mkdir -p /opt/puppeteer-cache && \

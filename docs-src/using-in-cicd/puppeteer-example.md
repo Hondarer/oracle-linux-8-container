@@ -1,6 +1,6 @@
 # Puppeteer の使用
 
-このコンテナには Puppeteer と Chromium がプリインストールされており、コンテナ起動後すぐにヘッドレスブラウザ自動化を利用できます。
+このコンテナには Chromium がプリインストールされており、コンテナ起動後すぐにヘッドレスブラウザ自動化を利用できます。
 
 ## 概要
 
@@ -15,7 +15,7 @@ Puppeteer は Node.js 用のヘッドレス Chrome/Chromium 制御ライブラ�
 ### プロジェクトへのインストール
 
 ```bash
-# ローカルプロジェクトにインストール（Chromium の再ダウンロードなし）
+# ローカルプロジェクトにインストール (Chromium の再ダウンロードなし)
 npm install puppeteer
 ```
 
@@ -110,7 +110,7 @@ const browser = await puppeteer.launch({
 
 ### メモリ使用量
 
-Chromium は比較的多くのメモリを使用します。CI/CD 環境では十分なメモリを割り当ててください（推奨: 2GB 以上）。
+Chromium は比較的多くのメモリを使用します。CI/CD 環境では十分なメモリを割り当ててください (推奨: 2GB 以上)。
 
 ### 並行実行
 
