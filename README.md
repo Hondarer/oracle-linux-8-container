@@ -195,10 +195,30 @@ podman system prune -f
 ./build-pod.sh
 ```
 
+## Windows環境でのインポート
+
+**外部ツール不要！** Windows標準のPowerShellのみで、ghcr.ioからコンテナイメージをダウンロードし、WSL2にインポートできます。
+
+### クイックスタート（Windows）
+
+```powershell
+# WSL2のインストール（未インストールの場合）
+wsl --install
+
+# スクリプトの実行
+.\import-from-ghcr.ps1
+
+# インポートされたディストリビューションを起動
+wsl -d OracleLinux8-Dev
+```
+
+詳細は [IMPORT_FROM_GHCR.md](IMPORT_FROM_GHCR.md) を参照してください。
+
 ## 関連ドキュメント
 
 ### プロジェクトドキュメント
 
+- **[IMPORT_FROM_GHCR.md](IMPORT_FROM_GHCR.md)** - Windows環境でのコンテナイメージのダウンロード・インポートガイド（外部ツール不要）
 - [docs-src/](docs-src/) - 追加ドキュメント
   - [GitHub Container Registry への公開ガイド](docs-src/publishing-to-github.md) - イメージの公開方法
   - [CI/CD でのコンテナイメージ利用ガイド](docs-src/using-in-cicd/) - 他のプロジェクトでの利用方法
