@@ -124,6 +124,9 @@ jobs:
           echo "=== Python version ==="
           podman exec $CONTAINER_ID python --version
 
+          echo "=== .NET version ==="
+          podman exec $CONTAINER_ID dotnet --version
+
           echo "=== Doxygen version ==="
           podman exec $CONTAINER_ID doxygen --version
 
