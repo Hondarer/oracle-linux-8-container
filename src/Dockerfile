@@ -56,7 +56,7 @@ RUN dnf install -y \
         dejavu-fonts-common \
         dejavu-sans-mono-fonts \
         desktop-file-utils \
-        dotnet-sdk-9.0 \
+        dotnet-sdk-10.0 \
         expect \
         glib-networking \
         glibc-langpack-ja \

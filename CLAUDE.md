@@ -20,7 +20,7 @@
 Dockerfile はポータブルイメージとして以下をセットアップします。
 
 1. Oracle Linux 8 パッケージの更新と開発ツールの導入
-2. 開発環境 (Node.js 22、Java 17、.NET 9.0、Python 3.11)
+2. 開発環境 (Node.js 22、Java 17、.NET 10、Python 3.11)
 3. ドキュメント生成ツール (Doxygen、PlantUML、Pandoc 系)
 4. 日本語環境とフォント設定
 5. SSH サーバーと認証キー設定
@@ -90,7 +90,7 @@ ssh-keygen -R "[127.0.0.1]:40022"
 
 ### インストール済みツール
 
-- **言語ランタイム**: Node.js 22、Java 17、.NET 9.0、Python 3.11
+- **言語ランタイム**: Node.js 22、Java 17、.NET 10、Python 3.11
 - **ビルドツール**: GCC、Make、CMake、automake、libtool
 - **ドキュメント**: Doxygen、doxybook2、PlantUML、Pandoc
 - **テスト**: GoogleTest (システムワイド)
@@ -101,7 +101,7 @@ ssh-keygen -R "[127.0.0.1]:40022"
 - **Node.js**: npm (ユーザーローカルプレフィックス設定済み)
 - **Python**: pip (システムとユーザー両方利用可能)
 - **Java**: OpenJDK 17 がデフォルト
-- **.NET**: SDK 9.0
+- **.NET**: SDK 10
 
 ### カスタムインストール処理
 

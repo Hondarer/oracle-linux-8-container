@@ -17,7 +17,7 @@ Oracle Linux 8 ベースのポータブルな開発用コンテナシステム�
 
 - **Node.js 22** + npm (ユーザーローカル設定)
 - **Java 17** (OpenJDK)
-- **.NET 9.0** SDK
+- **.NET 10** SDK
 - **Python 3.11** + pip
 - **C/C++** (GCC、開発ツール群)
 
@@ -234,7 +234,7 @@ podman system prune -f
 - **Oracle Linux 8**: GPL-2.0
 - **OpenJDK 17**: GPL-2.0 with Classpath Exception
 - **Node.js 22**: MIT License
-- **.NET 9.0**: MIT License
+- **.NET 10**: MIT License
 - **Python 3.11**: PSF License
 - **Doxygen**: GPL-2.0
 - **PlantUML**: GPL-3.0+
