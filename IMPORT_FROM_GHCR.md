@@ -1,81 +1,20 @@
 # ghcr.io からコンテナイメージをダウンロードし、WSL2 にインポートする手順
 
-このドキュメントでは、GitHub Container Registry (ghcr.io) に公開されている Oracle Linux 8 コンテナイメージを Windows 環境でダウンロードし、WSL2 にインポートする方法を説明します。
+このドキュメントでは、GitHub Container Registry (ghcr.io) に公開されている Oracle Linux 8 コンテナイメージを **外部ツール不要で** Windows 環境からダウンロードし、WSL2 にインポートする方法を説明します。
 
 ## 前提条件
 
-- **OS**: Windows 11 または Windows 10 (WSL2 対応バージョン)
+- **OS**: Windows 10 (1803以降) または Windows 11
 - **WSL2**: インストール済み
-- **PowerShell**: 管理者権限で実行可能
+- **インターネット接続**
 
-## アプローチ概要
-
-このリポジトリでは、2つのアプローチを提供しています:
-
-### アプローチ 1: PowerShell スクリプト (推奨)
-
-自動化された PowerShell スクリプトを使用して、ワンステップでイメージをダウンロード・インポートします。
-
-### アプローチ 2: WSL2 内で直接ダウンロード (シンプル)
-
-WSL2 内で Podman を使用して直接イメージをプルします。
+**重要**: このスクリプトは Podman や Docker などの外部ツールを一切必要としません。Windows 標準の PowerShell、tar.exe、wsl.exe のみで動作します。
 
 ---
 
-## アプローチ 1: PowerShell スクリプトを使用
+## クイックスタート
 
-### ステップ 1: Podman for Windows のインストール
-
-管理者権限で PowerShell を起動し、以下を実行:
-
-```powershell
-winget install -e --id RedHat.Podman
-```
-
-インストール後、PowerShell を再起動します。
-
-### ステップ 2: スクリプトの実行
-
-```powershell
-# リポジトリのルートディレクトリに移動
-cd path\to\oracle-linux-8-container
-
-# スクリプトを実行
-.\import-from-ghcr.ps1
-```
-
-#### オプション指定例
-
-```powershell
-# 特定の WSL ディストリビューションを指定
-.\import-from-ghcr.ps1 -TargetWslDistro "Ubuntu-22.04"
-
-# カスタムイメージ URL を指定
-.\import-from-ghcr.ps1 -ImageUrl "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:v1.0.0"
-
-# 一時ディレクトリを指定
-.\import-from-ghcr.ps1 -TempDir "D:\temp\podman-import"
-```
-
-### ステップ 3: インポートの確認
-
-WSL2 内で以下を実行して、イメージがインポートされたことを確認:
-
-```bash
-wsl podman images
-```
-
-出力例:
-```
-REPOSITORY                                                      TAG         IMAGE ID      CREATED      SIZE
-ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev    latest      abc123def456  2 days ago   2.5GB
-```
-
----
-
-## アプローチ 2: WSL2 内で直接ダウンロード
-
-### ステップ 1: WSL2 のインストール
+### ステップ 1: WSL2 のインストール（未インストールの場合）
 
 管理者権限で PowerShell を起動し、以下を実行:
 
@@ -83,35 +22,132 @@ ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev    latest      abc1
 wsl --install
 ```
 
-再起動後、WSL2 が利用可能になります。
+インストール後、システムを再起動します。
 
-### ステップ 2: WSL2 内で Podman をインストール
+### ステップ 2: スクリプトの実行
 
-WSL2 ターミナルを起動し、以下を実行:
+```powershell
+# リポジトリのルートディレクトリに移動
+cd path\to\oracle-linux-8-container
 
-```bash
-# Ubuntu/Debian の場合
-sudo apt-get update
-sudo apt-get install -y podman
-
-# または、より新しいバージョンをインストールする場合
-. /etc/os-release
-sudo sh -c "echo 'deb http://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /' > /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list"
-wget -nv https://download.opensuse.org/repositories/devel:kubic:libcontainers:stable/xUbuntu_${VERSION_ID}/Release.key -O- | sudo apt-key add -
-sudo apt-get update
-sudo apt-get install -y podman
+# スクリプトを実行（デフォルト設定）
+.\import-from-ghcr.ps1
 ```
 
-### ステップ 3: イメージのプル
+スクリプトは以下の処理を自動実行します：
+1. ✅ 前提条件のチェック（WSL2、tar コマンド）
+2. 🔐 ghcr.io から認証トークンを取得
+3. 📋 イメージマニフェストをダウンロード
+4. ⬇️ すべてのレイヤーをダウンロード
+5. 🔧 rootfs を構築
+6. 📦 tar.gz にアーカイブ
+7. 🚀 WSL2 にインポート
 
-```bash
-podman pull ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest
+### ステップ 3: インポートされたディストリビューションを起動
+
+```powershell
+# ディストリビューションを起動
+wsl -d OracleLinux8-Dev
+
+# またはデフォルトに設定
+wsl --set-default OracleLinux8-Dev
+wsl
 ```
 
-### ステップ 4: イメージの確認
+---
 
-```bash
-podman images
+## カスタムオプション
+
+### 基本的なオプション
+
+```powershell
+# カスタムディストリビューション名を指定
+.\import-from-ghcr.ps1 -WslDistroName "MyOracleLinux"
+
+# 特定のタグを指定
+.\import-from-ghcr.ps1 -ImageUrl "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:v1.0.0"
+
+# インストール先を指定
+.\import-from-ghcr.ps1 -InstallLocation "D:\WSL\OracleLinux8"
+
+# 一時ディレクトリを指定
+.\import-from-ghcr.ps1 -TempDir "D:\temp\wsl-import"
+```
+
+### すべてのオプションを組み合わせる例
+
+```powershell
+.\import-from-ghcr.ps1 `
+    -ImageUrl "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest" `
+    -WslDistroName "OracleLinux8-Custom" `
+    -InstallLocation "D:\WSL\OracleLinux8-Custom" `
+    -TempDir "D:\temp\wsl-import-custom"
+```
+
+---
+
+## 動作原理
+
+このスクリプトは OCI (Open Container Initiative) Registry API v2 を使用して、コンテナイメージを直接ダウンロードします。
+
+### 処理フロー
+
+```
+1. ghcr.io API v2 に接続
+   ↓
+2. 匿名認証トークンを取得
+   ↓
+3. イメージマニフェストを取得（JSON）
+   ↓
+4. マニフェストからレイヤー情報を抽出
+   ↓
+5. 各レイヤー（blob）を順番にダウンロード
+   ↓
+6. レイヤーを順番に展開して rootfs を構築
+   ↓
+7. rootfs を tar.gz にアーカイブ
+   ↓
+8. wsl --import で WSL2 にインポート
+```
+
+### 使用する Windows 標準ツール
+
+| ツール | 用途 | 最小要件 |
+|--------|------|----------|
+| **PowerShell** | HTTP リクエスト、スクリプト実行 | Windows 10/11 標準 |
+| **tar.exe** | アーカイブの展開・作成 | Windows 10 1803以降 |
+| **wsl.exe** | WSL2 管理 | WSL2 有効化済み |
+
+---
+
+## インポート後の確認
+
+### ディストリビューション一覧の確認
+
+```powershell
+wsl --list --verbose
+```
+
+出力例:
+```
+  NAME              STATE           VERSION
+* OracleLinux8-Dev  Running         2
+  Ubuntu            Stopped         2
+```
+
+### OS 情報の確認
+
+```powershell
+wsl -d OracleLinux8-Dev cat /etc/os-release
+```
+
+出力例:
+```
+NAME="Oracle Linux Server"
+VERSION="8.x"
+ID="ol"
+PRETTY_NAME="Oracle Linux Server 8.x"
+...
 ```
 
 ---
@@ -127,82 +163,173 @@ GitHub Container Registry で利用可能なタグを確認するには:
 
 ### プライベートイメージの認証
 
-イメージがプライベートリポジトリに存在する場合、認証が必要です:
+**注意**: 現在のスクリプトは匿名アクセス（パブリックイメージ）のみをサポートしています。
+
+プライベートイメージの場合、スクリプトの `Get-RegistryToken` 関数を以下のように修正してください:
 
 ```powershell
-# Windows Podman の場合
-podman login ghcr.io
-# ユーザー名: GitHubユーザー名
-# パスワード: Personal Access Token (packages:read 権限必要)
+function Get-RegistryToken {
+    param(
+        [string]$Registry,
+        [string]$Image,
+        [string]$Username,  # 追加
+        [string]$Token      # GitHub Personal Access Token (packages:read 権限)
+    )
+
+    $credentials = [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes("${Username}:${Token}"))
+    $headers = @{
+        "Authorization" = "Basic $credentials"
+    }
+
+    $tokenUrl = "https://$Registry/token?service=$Registry&scope=repository:$Image`:pull"
+    $response = Invoke-RestMethod -Uri $tokenUrl -Method Get -Headers $headers
+    return $response.token
+}
 ```
 
-```bash
-# WSL2 内の Podman の場合
-podman login ghcr.io
-# ユーザー名: GitHubユーザー名
-# パスワード: Personal Access Token (packages:read 権限必要)
-```
+### ディストリビューションの削除
 
-### イメージの tar.gz 保存と読み込み (手動)
-
-既存の `save-pod.sh` と `load-pod.sh` スクリプトを使用する場合:
-
-#### Windows 側で保存
+インポートしたディストリビューションを削除する場合:
 
 ```powershell
-# イメージをプル
-podman pull ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest
+# ディストリビューションを削除
+wsl --unregister OracleLinux8-Dev
 
-# tar.gz 形式で保存
-podman save ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest | gzip -9 > oracle-linux-8-dev.tar.gz
-
-# WSL2 からアクセス可能な場所にコピー
-# 例: C:\Users\YourName\Downloads\oracle-linux-8-dev.tar.gz
+# インストール先ディレクトリも削除する場合
+Remove-Item -Recurse -Force "$env:LOCALAPPDATA\WSL\OracleLinux8-Dev"
 ```
 
-#### WSL2 側で読み込み
+---
 
-```bash
-# tar.gz ファイルを WSL2 ホームディレクトリにコピー
-cp /mnt/c/Users/YourName/Downloads/oracle-linux-8-dev.tar.gz ~/
+## トラブルシューティング
 
-# イメージを読み込み
-gunzip -c ~/oracle-linux-8-dev.tar.gz | podman load
+### WSL2 がインストールされていない
 
-# イメージにタグを付ける (必要に応じて)
-podman tag <IMAGE_ID> oracle-linux-8:latest
+エラー:
+```
+WSL2 がインストールされていません。'wsl --install' を実行してください。
 ```
 
-### トラブルシューティング
-
-#### Podman Machine が起動しない
-
+対処法:
 ```powershell
-# Podman Machine を再作成
-podman machine stop
-podman machine rm
-podman machine init
-podman machine start
+# 管理者権限で PowerShell を起動し、以下を実行
+wsl --install
+
+# システムを再起動
 ```
 
-#### WSL2 で Podman が見つからない
+### tar コマンドが見つからない
 
-```bash
-# Podman のインストールを確認
-which podman
-
-# インストールされていない場合はインストール
-sudo apt-get update && sudo apt-get install -y podman
+エラー:
+```
+tar コマンドが見つかりません。Windows 10 (1803以降) または Windows 11 が必要です。
 ```
 
-#### イメージサイズが大きすぎる
+対処法:
+- Windows 10 の場合: バージョン 1803 以降にアップデートしてください
+- Windows 11 の場合: tar は標準搭載されているため、環境変数 PATH を確認してください
 
-Oracle Linux 8 開発コンテナは複数の開発ツールを含むため、サイズが大きくなります (約 2GB 以上)。十分なディスク容量を確保してください。
+### 認証エラー
+
+エラー:
+```
+認証エラー: 401 Unauthorized
+```
+
+対処法:
+- パブリックイメージの場合: イメージ URL が正しいか確認してください
+- プライベートイメージの場合: 上記の「プライベートイメージの認証」セクションを参照してください
+
+### レイヤーのダウンロード失敗
+
+エラー:
+```
+[X/Y] ダウンロード失敗: sha256:...
+```
+
+対処法:
+- インターネット接続を確認してください
+- ファイアウォールやプロキシ設定を確認してください
+- スクリプトを再実行してください（既にダウンロード済みのレイヤーはスキップされません）
+
+### ディスク容量不足
+
+エラー:
+```
+tar コマンドの実行に失敗しました
+```
+
+対処法:
+- Oracle Linux 8 開発コンテナは約 2-3GB のディスク容量が必要です
+- 一時ディレクトリ (`$env:TEMP`) と WSL インストール先に十分な空き容量があるか確認してください
+- `-TempDir` オプションで別のドライブを指定できます:
+  ```powershell
+  .\import-from-ghcr.ps1 -TempDir "D:\temp\wsl-import"
+  ```
+
+### ディストリビューション名が既に存在する
+
+警告:
+```
+警告: ディストリビューション 'OracleLinux8-Dev' は既に存在します
+既存のディストリビューションを削除して続行しますか? (y/N)
+```
+
+対処法:
+- `y` を入力して既存のディストリビューションを削除するか
+- `-WslDistroName` オプションで別の名前を指定してください:
+  ```powershell
+  .\import-from-ghcr.ps1 -WslDistroName "OracleLinux8-Dev2"
+  ```
+
+---
+
+## 技術的な詳細
+
+### OCI Registry API v2 について
+
+このスクリプトは、Open Container Initiative (OCI) が定義する Registry API v2 仕様を実装しています。
+
+**主要なエンドポイント:**
+
+| エンドポイント | 説明 |
+|---------------|------|
+| `/token` | 認証トークンを取得 |
+| `/v2/{name}/manifests/{reference}` | イメージマニフェストを取得 |
+| `/v2/{name}/blobs/{digest}` | レイヤー（blob）をダウンロード |
+
+**マニフェスト形式の対応:**
+- Docker Image Manifest V2
+- OCI Image Manifest V1
+- Docker Manifest List V2（マルチプラットフォーム）
+- OCI Image Index V1（マルチプラットフォーム）
+
+マルチプラットフォームイメージの場合、スクリプトは自動的に `linux/amd64` プラットフォームを選択します。
+
+### rootfs 構築の仕組み
+
+コンテナイメージは複数のレイヤー（tar.gz ファイル）で構成されています。各レイヤーは差分情報を含み、これらを順番に展開することで完全な rootfs が構築されます。
+
+```
+Layer 1 (Base): /bin, /usr, /etc, ...
+Layer 2 (Update): /usr/lib/updated-file.so
+Layer 3 (Application): /app/myapp
+...
+↓ 順番に展開
+rootfs: 完全なファイルシステム
+```
+
+### WSL2 インポート形式
+
+`wsl --import` コマンドは、Linux ファイルシステムのルートディレクトリ (`/`) を tar または tar.gz 形式でアーカイブしたファイルを受け付けます。
+
+このスクリプトは、OCI イメージレイヤーから構築した rootfs を tar.gz 形式でアーカイブして WSL2 にインポートします。
 
 ---
 
 ## 参考リンク
 
-- [Podman 公式ドキュメント](https://podman.io/)
+- [OCI Distribution Specification](https://github.com/opencontainers/distribution-spec)
+- [OCI Image Format Specification](https://github.com/opencontainers/image-spec)
 - [WSL2 公式ドキュメント](https://docs.microsoft.com/ja-jp/windows/wsl/)
 - [GitHub Container Registry ドキュメント](https://docs.github.com/ja/packages/working-with-a-github-packages-registry/working-with-the-container-registry)
