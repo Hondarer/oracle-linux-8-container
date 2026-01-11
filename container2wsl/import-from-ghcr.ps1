@@ -1,7 +1,5 @@
 # Oracle Linux 8 コンテナイメージを ghcr.io からダウンロードし、WSL2 にインポートする PowerShell スクリプト
 #
-# このスクリプトは外部ツール（Podman等）を使用せず、素のPowerShellのみで動作します
-#
 # 前提条件:
 # - Windows 10 (1803以降) または Windows 11
 # - WSL2 がインストール済み
@@ -20,7 +18,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
-$ProgressPreference = "SilentlyContinue"  # Invoke-WebRequestの進捗表示を無効化して高速化
+$ProgressPreference = "SilentlyContinue"  # Invoke-WebRequest の進捗表示を無効化して高速化
 
 # =============================================================================
 # カラー出力関数
@@ -52,7 +50,7 @@ function Write-Info {
 }
 
 # =============================================================================
-# イメージURL解析
+# イメージ URL 解析
 # =============================================================================
 
 function Parse-ImageUrl {
@@ -355,7 +353,6 @@ function Main {
     Write-Host ""
     Write-ColorOutput "========================================" "Cyan"
     Write-ColorOutput "  OCI イメージ → WSL2 インポートツール" "Cyan"
-    Write-ColorOutput "  (外部ツール不要・素のPowerShellのみ)" "Cyan"
     Write-ColorOutput "========================================" "Cyan"
     Write-Host ""
 

@@ -8,13 +8,11 @@
 - **WSL2**: インストール済み
 - **インターネット接続**
 
-**重要**: このスクリプトは Podman や Docker などの外部ツールを一切必要としません。Windows 標準の PowerShell、tar.exe、wsl.exe のみで動作します。
-
----
+このスクリプトは Podman や Docker などの外部ツールを一切必要としません。Windows 標準の PowerShell、tar.exe、wsl.exe のみで動作します。
 
 ## クイックスタート
 
-### ステップ 1: WSL2 のインストール（未インストールの場合）
+### ステップ 1: WSL2 のインストール (未インストールの場合)
 
 管理者権限で PowerShell を起動し、以下を実行:
 
@@ -30,18 +28,19 @@ wsl --install
 # リポジトリのルートディレクトリに移動
 cd path\to\oracle-linux-8-container
 
-# スクリプトを実行（デフォルト設定）
+# スクリプトを実行 (デフォルト設定)
 .\import-from-ghcr.ps1
 ```
 
-スクリプトは以下の処理を自動実行します：
-1. ✅ 前提条件のチェック（WSL2、tar コマンド）
-2. 🔐 ghcr.io から認証トークンを取得
-3. 📋 イメージマニフェストをダウンロード
-4. ⬇️ すべてのレイヤーをダウンロード
-5. 🔧 rootfs を構築
-6. 📦 tar.gz にアーカイブ
-7. 🚀 WSL2 にインポート
+スクリプトは以下の処理を自動実行します:
+
+1. 前提条件のチェック (WSL2、tar コマンド)
+2. ghcr.io から認証トークンを取得
+3. イメージマニフェストをダウンロード
+4. すべてのレイヤーをダウンロード
+5. rootfs を構築
+6. tar.gz にアーカイブ
+7. WSL2 にインポート
 
 ### ステップ 3: インポートされたディストリビューションを起動
 
@@ -53,8 +52,6 @@ wsl -d OracleLinux8-Dev
 wsl --set-default OracleLinux8-Dev
 wsl
 ```
-
----
 
 ## カスタムオプション
 
@@ -92,16 +89,16 @@ wsl
 
 ### 処理フロー
 
-```
+```text
 1. ghcr.io API v2 に接続
    ↓
 2. 匿名認証トークンを取得
    ↓
-3. イメージマニフェストを取得（JSON）
+3. イメージマニフェストを取得
    ↓
 4. マニフェストからレイヤー情報を抽出
    ↓
-5. 各レイヤー（blob）を順番にダウンロード
+5. 各レイヤーを順番にダウンロード
    ↓
 6. レイヤーを順番に展開して rootfs を構築
    ↓
@@ -118,8 +115,6 @@ wsl
 | **tar.exe** | アーカイブの展開・作成 | Windows 10 1803以降 |
 | **wsl.exe** | WSL2 管理 | WSL2 有効化済み |
 
----
-
 ## インポート後の確認
 
 ### ディストリビューション一覧の確認
@@ -129,7 +124,7 @@ wsl --list --verbose
 ```
 
 出力例:
-```
+```text
   NAME              STATE           VERSION
 * OracleLinux8-Dev  Running         2
   Ubuntu            Stopped         2
@@ -142,15 +137,13 @@ wsl -d OracleLinux8-Dev cat /etc/os-release
 ```
 
 出力例:
-```
+```text
 NAME="Oracle Linux Server"
 VERSION="8.x"
 ID="ol"
 PRETTY_NAME="Oracle Linux Server 8.x"
 ...
 ```
-
----
 
 ## 補足情報
 
@@ -163,7 +156,7 @@ GitHub Container Registry で利用可能なタグを確認するには:
 
 ### プライベートイメージの認証
 
-**注意**: 現在のスクリプトは匿名アクセス（パブリックイメージ）のみをサポートしています。
+現在のスクリプトは匿名アクセス (パブリックイメージ) のみをサポートしています。
 
 プライベートイメージの場合、スクリプトの `Get-RegistryToken` 関数を以下のように修正してください:
 
@@ -199,18 +192,18 @@ wsl --unregister OracleLinux8-Dev
 Remove-Item -Recurse -Force "$env:LOCALAPPDATA\WSL\OracleLinux8-Dev"
 ```
 
----
-
 ## トラブルシューティング
 
 ### WSL2 がインストールされていない
 
 エラー:
-```
+
+```text
 WSL2 がインストールされていません。'wsl --install' を実行してください。
 ```
 
 対処法:
+
 ```powershell
 # 管理者権限で PowerShell を起動し、以下を実行
 wsl --install
@@ -221,45 +214,53 @@ wsl --install
 ### tar コマンドが見つからない
 
 エラー:
-```
+
+```text
 tar コマンドが見つかりません。Windows 10 (1803以降) または Windows 11 が必要です。
 ```
 
 対処法:
+
 - Windows 10 の場合: バージョン 1803 以降にアップデートしてください
 - Windows 11 の場合: tar は標準搭載されているため、環境変数 PATH を確認してください
 
 ### 認証エラー
 
 エラー:
-```
+
+```text
 認証エラー: 401 Unauthorized
 ```
 
 対処法:
+
 - パブリックイメージの場合: イメージ URL が正しいか確認してください
 - プライベートイメージの場合: 上記の「プライベートイメージの認証」セクションを参照してください
 
 ### レイヤーのダウンロード失敗
 
 エラー:
-```
+
+```text
 [X/Y] ダウンロード失敗: sha256:...
 ```
 
 対処法:
+
 - インターネット接続を確認してください
 - ファイアウォールやプロキシ設定を確認してください
-- スクリプトを再実行してください（既にダウンロード済みのレイヤーはスキップされません）
+- スクリプトを再実行してください
 
 ### ディスク容量不足
 
 エラー:
-```
+
+```text
 tar コマンドの実行に失敗しました
 ```
 
 対処法:
+
 - Oracle Linux 8 開発コンテナは約 2-3GB のディスク容量が必要です
 - 一時ディレクトリ (`$env:TEMP`) と WSL インストール先に十分な空き容量があるか確認してください
 - `-TempDir` オプションで別のドライブを指定できます:
@@ -270,19 +271,19 @@ tar コマンドの実行に失敗しました
 ### ディストリビューション名が既に存在する
 
 警告:
-```
+
+```text
 警告: ディストリビューション 'OracleLinux8-Dev' は既に存在します
 既存のディストリビューションを削除して続行しますか? (y/N)
 ```
 
 対処法:
+
 - `y` を入力して既存のディストリビューションを削除するか
 - `-WslDistroName` オプションで別の名前を指定してください:
   ```powershell
   .\import-from-ghcr.ps1 -WslDistroName "OracleLinux8-Dev2"
   ```
-
----
 
 ## 技術的な詳細
 
@@ -296,21 +297,22 @@ tar コマンドの実行に失敗しました
 |---------------|------|
 | `/token` | 認証トークンを取得 |
 | `/v2/{name}/manifests/{reference}` | イメージマニフェストを取得 |
-| `/v2/{name}/blobs/{digest}` | レイヤー（blob）をダウンロード |
+| `/v2/{name}/blobs/{digest}` | レイヤー (blob) をダウンロード |
 
 **マニフェスト形式の対応:**
+
 - Docker Image Manifest V2
 - OCI Image Manifest V1
-- Docker Manifest List V2（マルチプラットフォーム）
-- OCI Image Index V1（マルチプラットフォーム）
+- Docker Manifest List V2 (マルチプラットフォーム)
+- OCI Image Index V1 (マルチプラットフォーム)
 
 マルチプラットフォームイメージの場合、スクリプトは自動的に `linux/amd64` プラットフォームを選択します。
 
 ### rootfs 構築の仕組み
 
-コンテナイメージは複数のレイヤー（tar.gz ファイル）で構成されています。各レイヤーは差分情報を含み、これらを順番に展開することで完全な rootfs が構築されます。
+コンテナイメージは複数のレイヤー (tar.gz ファイル) で構成されています。各レイヤーは差分情報を含み、これらを順番に展開することで完全な rootfs が構築されます。
 
-```
+```text
 Layer 1 (Base): /bin, /usr, /etc, ...
 Layer 2 (Update): /usr/lib/updated-file.so
 Layer 3 (Application): /app/myapp
@@ -324,8 +326,6 @@ rootfs: 完全なファイルシステム
 `wsl --import` コマンドは、Linux ファイルシステムのルートディレクトリ (`/`) を tar または tar.gz 形式でアーカイブしたファイルを受け付けます。
 
 このスクリプトは、OCI イメージレイヤーから構築した rootfs を tar.gz 形式でアーカイブして WSL2 にインポートします。
-
----
 
 ## 参考リンク
 
