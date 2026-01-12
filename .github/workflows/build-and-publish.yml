@@ -153,6 +153,44 @@ jobs:
             podman push $tag
           done
 
+      - name: Export and push WSL rootfs as OCI artifact
+        if: github.event_name != 'pull_request'
+        run: |
+          # WSL 用 rootfs のエクスポート
+          echo "==> Exporting WSL rootfs..."
+          CONTAINER_ID=$(podman create ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ github.sha }})
+          podman export $CONTAINER_ID | gzip > wsl-rootfs.tar.gz
+          podman rm $CONTAINER_ID
+
+          # ファイルサイズを記録
+          ls -lh wsl-rootfs.tar.gz
+
+          # ORAS のインストール
+          echo "==> Installing ORAS..."
+          ORAS_VERSION="1.1.0"
+          curl -sLO "https://github.com/oras-project/oras/releases/download/v${ORAS_VERSION}/oras_${ORAS_VERSION}_linux_amd64.tar.gz"
+          tar -xzf "oras_${ORAS_VERSION}_linux_amd64.tar.gz"
+          chmod +x oras
+
+          # OCI Artifact として push (タグごと)
+          echo "==> Pushing WSL rootfs as OCI artifact..."
+          TAGS="${{ steps.meta.outputs.tags }}"
+          for tag in $TAGS; do
+            # コンテナイメージのタグから WSL rootfs のタグを生成
+            WSL_TAG="${tag}-wsl"
+            echo "Pushing WSL rootfs: $WSL_TAG"
+
+            ./oras push "$WSL_TAG" \
+              wsl-rootfs.tar.gz:application/vnd.wsl.rootfs.v1.tar+gzip \
+              --annotation "org.opencontainers.image.title=WSL2 Rootfs for Oracle Linux 8 Development" \
+              --annotation "org.opencontainers.image.description=Pre-built rootfs for importing into WSL2" \
+              --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
+              --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
+              --annotation "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+          done
+
+          echo "==> WSL rootfs published successfully"
+
       - name: Output image information
         if: github.event_name != 'pull_request'
         run: |
@@ -161,12 +199,23 @@ jobs:
           echo "**Registry:** ${{ env.REGISTRY }}" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** ${{ env.IMAGE_NAME }}" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Tags" >> $GITHUB_STEP_SUMMARY
+          echo "### Container Image Tags" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "${{ steps.meta.outputs.tags }}" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Pull command" >> $GITHUB_STEP_SUMMARY
+          echo "### WSL2 Rootfs Tags" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.meta.outputs.tags }}" | sed 's/$/-wsl/' >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Pull command (Container)" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`bash" >> $GITHUB_STEP_SUMMARY
           echo "podman pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Import to WSL2" >> $GITHUB_STEP_SUMMARY
+          echo "\`\`\`powershell" >> $GITHUB_STEP_SUMMARY
+          echo "# Download and run the import script" >> $GITHUB_STEP_SUMMARY
+          echo "irm https://raw.githubusercontent.com/${{ github.repository }}/main/import-wsl.ps1 | iex" >> $GITHUB_STEP_SUMMARY
           echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
