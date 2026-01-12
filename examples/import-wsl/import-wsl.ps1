@@ -14,7 +14,8 @@
 # - wsl.exe (WSL2 管理コマンド)
 
 param(
-    [string]$ImageUrl = "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest-wsl",
+    [string]$Tag = "latest-wsl",
+    [string]$ImageUrl = "",
     [string]$WslDistroName = "OracleLinux8-Dev",
     [string]$InstallLocation = "$env:LOCALAPPDATA\WSL\$WslDistroName",
     [string]$TempDir = "$env:TEMP\wsl-import-$(Get-Date -Format 'yyyyMMddHHmmss')"
@@ -187,7 +188,14 @@ function Import-ToWSL2 {
     # 既存のディストリビューションを確認
     $existingDistros = wsl --list --quiet 2>$null
     if ($existingDistros -contains $DistroName) {
-        Write-Info "既存のディストリビューション '$DistroName' が見つかりました"
+        Write-Host ""
+        Write-ColorOutput "警告: 既存のディストリビューション '$DistroName' が見つかりました" "Yellow"
+        Write-Host ""
+        Write-ColorOutput "  このディストリビューションを削除すると、以下のデータがすべて失われます:" "Red"
+        Write-Host "  - ホームディレクトリ内のすべてのファイル"
+        Write-Host "  - インストールされたパッケージと設定"
+        Write-Host "  - ユーザーデータとカスタマイズ"
+        Write-Host ""
         $response = Read-Host "削除して再インポートしますか? (y/N)"
         if ($response -eq 'y' -or $response -eq 'Y') {
             Write-Info "既存のディストリビューションを削除中..."
@@ -248,6 +256,11 @@ function Main {
     Write-ColorOutput "  Oracle Linux 8 開発環境" "Cyan"
     Write-ColorOutput "========================================" "Cyan"
     Write-Host ""
+
+    # ImageUrl が指定されていない場合、Tag パラメータを使用して構築
+    if ([string]::IsNullOrEmpty($ImageUrl)) {
+        $script:ImageUrl = "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:$Tag"
+    }
 
     # パラメータ表示
     Write-Host "設定:"

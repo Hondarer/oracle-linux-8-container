@@ -197,7 +197,7 @@ podman system prune -f
 
 ## Windows 環境で WSL2 にインポート
 
-**外部ツール不要！** Windows 標準の PowerShell のみで、GitHub Container Registry から WSL2 用 rootfs をダウンロードし、WSL2 ディストリビューションとしてインポートできます。
+Windows 標準の PowerShell のみで、GitHub Container Registry から WSL2 用 rootfs をダウンロードし、WSL2 ディストリビューションとしてインポートできます。
 
 ### クイックスタート (Windows)
 
@@ -206,29 +206,13 @@ podman system prune -f
 wsl --install
 
 # スクリプトをダウンロードして実行
-irm https://raw.githubusercontent.com/hondarer/oracle-linux-8-container/main/import-wsl.ps1 | iex
+irm https://raw.githubusercontent.com/hondarer/oracle-linux-8-container/main/examples/import-wsl/import-wsl.ps1 | iex
 
 # インポートされたディストリビューションを起動
 wsl -d OracleLinux8-Dev
 ```
 
-### ローカルスクリプトを使用する場合
-
-```powershell
-# リポジトリをクローン
-git clone https://github.com/hondarer/oracle-linux-8-container.git
-cd oracle-linux-8-container
-
-# スクリプトを実行
-.\import-wsl.ps1
-
-# カスタムパラメータで実行
-.\import-wsl.ps1 -WslDistroName "MyOracleLinux" -InstallLocation "C:\WSL\MyDist"
-```
-
-### 仕組み
-
-このスクリプトは、GitHub Container Registry の OCI Artifact として公開されている WSL2 専用 rootfs (tar.gz) を PowerShell の標準機能 (Invoke-RestMethod、Invoke-WebRequest) でダウンロードし、`wsl.exe` を使用してインポートします。コンテナイメージと完全に等価な環境を WSL2 で利用できます。
+詳細は [examples/import-wsl/README.md](examples/import-wsl/README.md) を参照してください。
 
 ## 関連ドキュメント
 
