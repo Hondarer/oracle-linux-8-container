@@ -195,30 +195,45 @@ podman system prune -f
 ./build-pod.sh
 ```
 
-## Windows環境でのインポート
+## Windows 環境で WSL2 にインポート
 
-**外部ツール不要！** Windows標準のPowerShellのみで、ghcr.ioからコンテナイメージをダウンロードし、WSL2にインポートできます。
+**外部ツール不要！** Windows 標準の PowerShell のみで、GitHub Container Registry から WSL2 用 rootfs をダウンロードし、WSL2 ディストリビューションとしてインポートできます。
 
-### クイックスタート（Windows）
+### クイックスタート (Windows)
 
 ```powershell
-# WSL2のインストール（未インストールの場合）
+# WSL2 のインストール (未インストールの場合)
 wsl --install
 
-# スクリプトの実行
-.\import-from-ghcr.ps1
+# スクリプトをダウンロードして実行
+irm https://raw.githubusercontent.com/hondarer/oracle-linux-8-container/main/import-wsl.ps1 | iex
 
 # インポートされたディストリビューションを起動
 wsl -d OracleLinux8-Dev
 ```
 
-詳細は [IMPORT_FROM_GHCR.md](IMPORT_FROM_GHCR.md) を参照してください。
+### ローカルスクリプトを使用する場合
+
+```powershell
+# リポジトリをクローン
+git clone https://github.com/hondarer/oracle-linux-8-container.git
+cd oracle-linux-8-container
+
+# スクリプトを実行
+.\import-wsl.ps1
+
+# カスタムパラメータで実行
+.\import-wsl.ps1 -WslDistroName "MyOracleLinux" -InstallLocation "C:\WSL\MyDist"
+```
+
+### 仕組み
+
+このスクリプトは、GitHub Container Registry の OCI Artifact として公開されている WSL2 専用 rootfs (tar.gz) を PowerShell の標準機能 (Invoke-RestMethod、Invoke-WebRequest) でダウンロードし、`wsl.exe` を使用してインポートします。コンテナイメージと完全に等価な環境を WSL2 で利用できます。
 
 ## 関連ドキュメント
 
 ### プロジェクトドキュメント
 
-- **[IMPORT_FROM_GHCR.md](IMPORT_FROM_GHCR.md)** - Windows環境でのコンテナイメージのダウンロード・インポートガイド（外部ツール不要）
 - [docs-src/](docs-src/) - 追加ドキュメント
   - [GitHub Container Registry への公開ガイド](docs-src/publishing-to-github.md) - イメージの公開方法
   - [CI/CD でのコンテナイメージ利用ガイド](docs-src/using-in-cicd/) - 他のプロジェクトでの利用方法
