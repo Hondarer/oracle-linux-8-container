@@ -66,6 +66,7 @@ RUN dnf install -y \
         hwdata \
         java-17-openjdk \
         java-17-openjdk-devel \
+        libssh-devel \
         jq \
         json-glib \
         libGL \
