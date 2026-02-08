@@ -1,0 +1,94 @@
+{
+  "name": "Oracle Linux 10 Development Container",
+
+  // 公開されたコンテナイメージを使用
+  "image": "ghcr.io/hondarer/oracle-linux-container/oracle-linux-10-dev:latest",
+
+  // コンテナ作成後にユーザーセットアップを実行
+  "postCreateCommand": "bash -c 'export HOST_USER=${localEnv:USER:vscode} HOST_UID=${localEnv:UID:1000} HOST_GID=${localEnv:GID:1000} && sudo /usr/local/bin/devcontainer-entrypoint.sh'",
+
+  // コンテナ内で使用するユーザー
+  // postCreateCommand でこのユーザーが作成される
+  "remoteUser": "${localEnv:USER:vscode}",
+
+  // 初期接続は root で行う（ユーザー作成のため）
+  "containerUser": "root",
+
+  // 環境変数
+  "containerEnv": {
+    "LANG": "ja_JP.UTF-8"
+  },
+
+  // マウント設定
+  "mounts": [
+    // ホームディレクトリの永続化
+    "source=${localWorkspaceFolderBasename}-home,target=/home/${localEnv:USER:vscode},type=volume",
+    // SSH 認証情報の共有（オプション）
+    "source=${localEnv:HOME}/.ssh,target=/tmp/host-ssh,type=bind,readonly,consistency=cached"
+  ],
+
+  // ワークスペースフォルダ
+  "workspaceFolder": "/workspace",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind,consistency=cached",
+
+  // ポート転送（プロジェクトに応じて調整）
+  "forwardPorts": [],
+
+  // VS Code 拡張機能の推奨
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        // C/C++
+        "ms-vscode.cpptools",
+        "ms-vscode.cpptools-extension-pack",
+        "ms-vscode.cmake-tools",
+
+        // Node.js
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+
+        // Java
+        "vscjava.vscode-java-pack",
+
+        // .NET
+        "ms-dotnettools.csharp",
+        "ms-dotnettools.csdevkit",
+
+        // Python
+        "ms-python.python",
+        "ms-python.vscode-pylance",
+
+        // ドキュメント
+        "cschlosser.doxdocgen",
+        "jebbs.plantuml",
+
+        // Git
+        "eamodio.gitlens",
+
+        // その他
+        "editorconfig.editorconfig",
+        "streetsidesoftware.code-spell-checker"
+      ],
+      "settings": {
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.profiles.linux": {
+          "bash": {
+            "path": "/bin/bash"
+          }
+        },
+        "files.eol": "\n",
+        "editor.formatOnSave": false
+      }
+    }
+  },
+
+  // コンテナ起動オプション
+  "runArgs": [
+    "--privileged",
+    "--cap-add=SYS_PTRACE",
+    "--security-opt=seccomp=unconfined"
+  ],
+
+  // 機能追加（Dev Container Features）
+  "features": {}
+}

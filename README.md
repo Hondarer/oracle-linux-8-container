@@ -1,6 +1,8 @@
-# Oracle Linux 8 開発用コンテナ
+# Oracle Linux 開発用コンテナ
 
-Oracle Linux 8 ベースのポータブルな開発用コンテナシステムです。Podman を使用して、開発ツールや日本語環境が事前設定された開発環境を簡単に構築・利用できます。
+Oracle Linux ベースのポータブルな開発用コンテナシステムです。Podman を使用して、開発ツールや日本語環境が事前設定された開発環境を簡単に構築・利用できます。
+
+Oracle Linux 8 および 10 のマルチバージョンに対応しています。
 
 ## 特徴
 
@@ -15,11 +17,13 @@ Oracle Linux 8 ベースのポータブルな開発用コンテナシステム�
 
 ### 言語ランタイム
 
-- **Node.js 22** + npm (ユーザーローカル設定)
-- **Java 17** (OpenJDK)
-- **.NET 10** SDK
-- **Python 3.11** + pip
-- **C/C++** (GCC、開発ツール群)
+| ツール | OL8 | OL10 |
+|--------|-----|------|
+| Node.js | 22 | 22 |
+| Java (OpenJDK) | 17 | 21 |
+| .NET SDK | 10 | 10 |
+| Python | 3.11 | 3.12 |
+| C/C++ (GCC) | 8 | 14 |
 
 ### ドキュメント生成
 
@@ -44,29 +48,44 @@ Oracle Linux 8 ベースのポータブルな開発用コンテナシステム�
 ### イメージビルド
 
 ```bash
-./build-pod.sh
+# OL8 をビルド (デフォルト)
+./build-pod.sh 8
+
+# OL10 をビルド
+./build-pod.sh 10
 ```
 
 ### コンテナ起動
 
 ```bash
-./start-pod.sh
+# OL8 インスタンス1 を起動 (デフォルト)
+./start-pod.sh 8
+
+# OL10 インスタンス1 を起動
+./start-pod.sh 10
 ```
 
 ### SSH 接続
 
 ```bash
-# SSH 接続 (ポート 40022)
-ssh -p 40022 user@127.0.0.1
+# OL8 SSH 接続 (ポート 40822)
+ssh -p 40822 user@127.0.0.1
+
+# OL10 SSH 接続 (ポート 41022)
+ssh -p 41022 user@127.0.0.1
 
 # 初回接続時、SSH キーキャッシュのクリア
-ssh-keygen -R "[127.0.0.1]:40022"
+ssh-keygen -R "[127.0.0.1]:40822"
 ```
 
 ### コンテナ停止
 
 ```bash
-./stop-pod.sh
+# OL8 を停止
+./stop-pod.sh 8
+
+# OL10 を停止
+./stop-pod.sh 10
 ```
 
 ## 基本的な使い方
@@ -109,11 +128,15 @@ pandoc README.md -o README.pdf
 ### イメージの保存・読み込み
 
 ```bash
-# イメージを圧縮ファイルとして保存
-./save-pod.sh
+# OL8 イメージを圧縮ファイルとして保存
+./save-pod.sh 8
+
+# OL10 イメージを保存
+./save-pod.sh 10
 
 # 保存したイメージを読み込み
-./load-pod.sh
+./load-pod.sh 8
+./load-pod.sh 10
 ```
 
 ### 追加パッケージの事前配置
@@ -140,10 +163,14 @@ pandoc README.md -o README.pdf
 │   ├── keys/            # SSH ホストキー (オプション)
 │   ├── fonts/           # 追加フォント (オプション)
 │   └── packages/        # 追加パッケージ (オプション)
+├── version-config.sh     # バージョン別共通設定
 ├── storage/              # 永続化データ
-│   └── 1/
-│       ├── home_${USER}/ # ユーザーホーム
-│       └── workspace/    # 作業ディレクトリ
+│   ├── 8/1/             # OL8 インスタンス1
+│   │   ├── home_${USER}/
+│   │   └── workspace/
+│   └── 10/1/            # OL10 インスタンス1
+│       ├── home_${USER}/
+│       └── workspace/
 ├── image/                # イメージ保存場所
 ├── CLAUDE.md             # Claude Code 用ガイド
 └── README.md             # このファイル
@@ -151,12 +178,13 @@ pandoc README.md -o README.pdf
 
 ## 技術仕様
 
-- **ベースイメージ**: Oracle Linux 8
+- **ベースイメージ**: Oracle Linux 8 / 10
 - **コンテナエンジン**: Podman (rootless mode)
 - **アーキテクチャ**: x86_64
-- **ポート**: 22 (SSH)
+- **ポート**: 22 (SSH、ホスト側は 40822/41022 等)
 - **マウント**: ホームディレクトリ、ワークスペース
 - **UID/GID マッピング**: Podman keep-id
+- **ストレージ**: `./storage/{version}/{instance}/`
 
 ## トラブルシューティング
 
@@ -166,11 +194,11 @@ pandoc README.md -o README.pdf
 # コンテナの状態確認
 podman ps
 
-# コンテナログの確認
+# コンテナログの確認 (OL8 の場合)
 podman logs oracle-linux-8_1
 
-# SSH キーキャッシュのクリア
-ssh-keygen -R "[127.0.0.1]:40022"
+# SSH キーキャッシュのクリア (OL8 の場合)
+ssh-keygen -R "[127.0.0.1]:40822"
 ```
 
 ### 権限エラーが発生する場合
@@ -179,20 +207,20 @@ ssh-keygen -R "[127.0.0.1]:40022"
 # SELinux コンテキストの修正
 sudo restorecon -R ./storage/
 
-# ストレージディレクトリの再作成
-rm -rf ./storage/1/
-mkdir -p ./storage/1/{home_$(whoami),workspace}
+# ストレージディレクトリの再作成 (OL8 インスタンス1 の場合)
+rm -rf ./storage/8/1/
+mkdir -p ./storage/8/1/{home_$(whoami),workspace}
 ```
 
 ### ビルドエラーが発生する場合
 
 ```bash
-# 古いイメージの削除
+# 古いイメージの削除 (OL8 の場合)
 podman rmi oracle-linux-8
 
 # キャッシュクリア後の再ビルド
 podman system prune -f
-./build-pod.sh
+./build-pod.sh 8
 ```
 
 ## Windows 環境で WSL2 にインポート
@@ -205,8 +233,11 @@ Windows 標準の PowerShell のみで、GitHub Container Registry から WSL2 �
 # WSL2 のインストール (未インストールの場合)
 wsl --install
 
-# スクリプトをダウンロードして実行
-irm https://raw.githubusercontent.com/hondarer/oracle-linux-8-container/main/examples/import-wsl/import-wsl.ps1 | iex
+# スクリプトをダウンロードして実行 (OL8)
+irm https://raw.githubusercontent.com/hondarer/oracle-linux-container/main/examples/import-wsl/import-wsl.ps1 | iex
+
+# OL10 の場合
+.\import-wsl.ps1 -OLVersion 10
 
 # インポートされたディストリビューションを起動
 wsl -d OracleLinux8-Dev
@@ -227,6 +258,7 @@ wsl -d OracleLinux8-Dev
 ### 外部リンク
 
 - [Oracle Linux 8 公式ドキュメント](https://docs.oracle.com/en/operating-systems/oracle-linux/8/)
+- [Oracle Linux 10 公式ドキュメント](https://docs.oracle.com/en/operating-systems/oracle-linux/10/)
 - [Podman 公式ドキュメント](https://podman.io/docs)
 
 ## ライセンス
@@ -250,11 +282,11 @@ wsl -d OracleLinux8-Dev
 
 ### 主要コンポーネントのライセンス
 
-- **Oracle Linux 8**: GPL-2.0
-- **OpenJDK 17**: GPL-2.0 with Classpath Exception
+- **Oracle Linux 8/10**: GPL-2.0
+- **OpenJDK 17/21**: GPL-2.0 with Classpath Exception
 - **Node.js 22**: MIT License
 - **.NET 10**: MIT License
-- **Python 3.11**: PSF License
+- **Python 3.11/3.12**: PSF License
 - **Doxygen**: GPL-2.0
 - **PlantUML**: GPL-3.0+
 - **Pandoc**: GPL-2.0+

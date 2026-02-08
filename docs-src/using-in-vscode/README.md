@@ -1,6 +1,6 @@
 # VS Code Dev Container として使用する
 
-このドキュメントでは、公開されている Oracle Linux 8 開発用コンテナイメージを、あなたのプロジェクトで VS Code の Dev Container として使用する方法を説明します。
+このドキュメントでは、公開されている Oracle Linux 開発用コンテナイメージを、あなたのプロジェクトで VS Code の Dev Container として使用する方法を説明します。
 
 ## 目次
 
@@ -14,7 +14,7 @@
 
 ## 概要
 
-公開されているコンテナイメージ `ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev` を VS Code の Dev Container として使用することで、以下の利点が得られます：
+公開されているコンテナイメージ `ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev` (OL8) や `oracle-linux-10-dev` (OL10) を VS Code の Dev Container として使用することで、以下の利点が得られます：
 
 - **一貫した開発環境**: 開発ツールとライブラリが事前設定済み
 - **簡単なセットアップ**: 設定ファイルをコピーするだけ
@@ -57,15 +57,15 @@
 cd /path/to/your/project
 
 # サンプル設定をコピー
-cp -r /path/to/oracle-linux-8-container/examples/devcontainer .devcontainer
+cp -r /path/to/oracle-linux-container/examples/devcontainer .devcontainer
 ```
 
 または、手動で `.devcontainer/devcontainer.json` を作成：
 
 ```json
 {
-  "name": "Oracle Linux 8 Development Container",
-  "image": "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest",
+  "name": "Oracle Linux Development Container",
+  "image": "ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:latest",
   "postCreateCommand": "bash -c 'export HOST_USER=${localEnv:USER:vscode} HOST_UID=${localEnv:UID:1000} HOST_GID=${localEnv:GID:1000} && sudo /usr/local/bin/devcontainer-entrypoint.sh'",
   "remoteUser": "${localEnv:USER:vscode}",
   "containerUser": "root",
@@ -105,7 +105,7 @@ VS Code が起動したら：
 # バージョン確認
 node --version    # Node.js 22
 java -version     # OpenJDK 17
-dotnet --version  # .NET 9.0
+dotnet --version  # .NET 10.0
 python --version  # Python 3.11
 
 # ドキュメント生成ツール
@@ -128,7 +128,7 @@ gcc --version
 
 ```json
 {
-  "image": "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest"
+  "image": "ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:latest"
 }
 ```
 
@@ -136,7 +136,7 @@ gcc --version
 
 ```json
 {
-  "image": "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:v20250116"
+  "image": "ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:v20250116"
 }
 ```
 
@@ -204,7 +204,7 @@ gcc --version
 
 ```json
 {
-  "image": "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest",
+  "image": "ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:latest",
   "postCreateCommand": "bash -c 'export HOST_USER=${localEnv:USER:vscode} HOST_UID=${localEnv:UID:1000} HOST_GID=${localEnv:GID:1000} && sudo /usr/local/bin/devcontainer-entrypoint.sh && npm install'",
   "forwardPorts": [3000],
   "customizations": {
@@ -222,7 +222,7 @@ gcc --version
 
 ```json
 {
-  "image": "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest",
+  "image": "ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:latest",
   "postCreateCommand": "bash -c 'export HOST_USER=${localEnv:USER:vscode} HOST_UID=${localEnv:UID:1000} HOST_GID=${localEnv:GID:1000} && sudo /usr/local/bin/devcontainer-entrypoint.sh && pip install -r requirements.txt'",
   "forwardPorts": [8000],
   "customizations": {
@@ -240,7 +240,7 @@ gcc --version
 
 ```json
 {
-  "image": "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest",
+  "image": "ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:latest",
   "postCreateCommand": "bash -c 'export HOST_USER=${localEnv:USER:vscode} HOST_UID=${localEnv:UID:1000} HOST_GID=${localEnv:GID:1000} && sudo /usr/local/bin/devcontainer-entrypoint.sh && mkdir -p build && cd build && cmake ..'",
   "customizations": {
     "vscode": {
@@ -275,9 +275,9 @@ gcc --version
 2. Docker Desktop / Podman が起動していることを確認
 3. 手動でイメージをダウンロード：
    ```bash
-   docker pull ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest
+   docker pull ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:latest
    # または
-   podman pull ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest
+   podman pull ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:latest
    ```
 
 ### ファイルの権限エラー

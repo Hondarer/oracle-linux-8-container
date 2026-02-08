@@ -1,4 +1,4 @@
-﻿# Oracle Linux 8 開発環境を WSL2 にインポートする PowerShell スクリプト
+﻿# Oracle Linux 開発環境を WSL2 にインポートする PowerShell スクリプト
 #
 # このスクリプトは、GitHub Container Registry (ghcr.io) から
 # OCI Artifact として公開されている WSL2 rootfs をダウンロードし、
@@ -14,12 +14,21 @@
 # - wsl.exe (WSL2 管理コマンド)
 
 param(
+    [string]$OLVersion = "8",
     [string]$Tag = "latest-wsl",
     [string]$ImageUrl = "",
-    [string]$WslDistroName = "OracleLinux8-Dev",
-    [string]$InstallLocation = "$env:LOCALAPPDATA\WSL\$WslDistroName",
+    [string]$WslDistroName = "",
+    [string]$InstallLocation = "",
     [string]$TempDir = "$env:TEMP\wsl-import-$(Get-Date -Format 'yyyyMMddHHmmss')"
 )
+
+# デフォルト値の設定
+if ([string]::IsNullOrEmpty($WslDistroName)) {
+    $WslDistroName = "OracleLinux${OLVersion}-Dev"
+}
+if ([string]::IsNullOrEmpty($InstallLocation)) {
+    $InstallLocation = "$env:LOCALAPPDATA\WSL\$WslDistroName"
+}
 
 $ErrorActionPreference = "Stop"
 $ProgressPreference = "SilentlyContinue"  # 進捗表示を無効化して高速化
@@ -253,13 +262,13 @@ function Main {
     Write-Host ""
     Write-ColorOutput "========================================" "Cyan"
     Write-ColorOutput "  WSL2 インポートツール" "Cyan"
-    Write-ColorOutput "  Oracle Linux 8 開発環境" "Cyan"
+    Write-ColorOutput "  Oracle Linux $OLVersion 開発環境" "Cyan"
     Write-ColorOutput "========================================" "Cyan"
     Write-Host ""
 
     # ImageUrl が指定されていない場合、Tag パラメータを使用して構築
     if ([string]::IsNullOrEmpty($ImageUrl)) {
-        $script:ImageUrl = "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:$Tag"
+        $script:ImageUrl = "ghcr.io/hondarer/oracle-linux-container/oracle-linux-${OLVersion}-dev:$Tag"
     }
 
     # パラメータ表示

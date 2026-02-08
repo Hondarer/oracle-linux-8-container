@@ -1,6 +1,6 @@
 # WSL2 インポートツール
 
-Oracle Linux 8 開発環境を WSL2 にインポートするための PowerShell スクリプトです。
+Oracle Linux 開発環境を WSL2 にインポートするための PowerShell スクリプトです。OL8 と OL10 に対応しています。
 
 ## 概要
 
@@ -26,7 +26,7 @@ wsl --install
 
 ```powershell
 # スクリプトをダウンロードして実行
-irm https://raw.githubusercontent.com/hondarer/oracle-linux-8-container/main/examples/import-wsl/import-wsl.ps1 | iex
+irm https://raw.githubusercontent.com/hondarer/oracle-linux-container/main/examples/import-wsl/import-wsl.ps1 | iex
 
 # インポートされたディストリビューションを起動
 wsl -d OracleLinux8-Dev
@@ -36,8 +36,8 @@ wsl -d OracleLinux8-Dev
 
 ```powershell
 # リポジトリをクローン
-git clone https://github.com/hondarer/oracle-linux-8-container.git
-cd oracle-linux-8-container\examples\import-wsl
+git clone https://github.com/hondarer/oracle-linux-container.git
+cd oracle-linux-container\examples\import-wsl
 
 # スクリプトを実行 (デフォルト: latest-wsl タグ)
 .\import-wsl.ps1
@@ -49,10 +49,21 @@ cd oracle-linux-8-container\examples\import-wsl
 .\import-wsl.ps1 -WslDistroName "MyOracleLinux" -InstallLocation "C:\WSL\MyDist"
 
 # 完全なイメージ URL を指定する場合
-.\import-wsl.ps1 -ImageUrl "ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:v1.0.0-wsl"
+.\import-wsl.ps1 -ImageUrl "ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:v1.0.0-wsl"
 ```
 
 ## パラメータ
+
+### OLVersion
+
+Oracle Linux のバージョンを指定します (デフォルト: `8`)
+
+使用例:
+
+```powershell
+# OL10 をインポート
+.\import-wsl.ps1 -OLVersion 10
+```
 
 ### Tag
 
@@ -88,7 +99,7 @@ cd oracle-linux-8-container\examples\import-wsl
 
 ### WslDistroName
 
-WSL ディストリビューション名を指定します (デフォルト: `OracleLinux8-Dev`)
+WSL ディストリビューション名を指定します (デフォルト: `OracleLinux{OLVersion}-Dev`、例: `OracleLinux8-Dev`)
 
 使用例:
 
@@ -273,7 +284,7 @@ Remove-Item -Recurse -Force "$env:TEMP\wsl-import-*"
 ## 関連リンク
 
 - [プロジェクトルート README](../../README.md)
-- [GitHub Container Registry](https://github.com/Hondarer/oracle-linux-8-container/pkgs/container/oracle-linux-8-container%2Foracle-linux-8-dev)
+- [GitHub Container Registry](https://github.com/Hondarer/oracle-linux-container/pkgs/container/oracle-linux-container%2Foracle-linux-8-dev)
 - [WSL ドキュメント](https://learn.microsoft.com/ja-jp/windows/wsl/)
 
 ## ライセンス

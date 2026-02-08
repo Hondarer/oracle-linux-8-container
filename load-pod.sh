@@ -3,7 +3,7 @@
 # rootless podman-compose では、正しく UID のマッピングができない (userns が利用できない) ため、
 # podman を直接操作する
 
-CONTAINER_NAME=oracle-linux-8
+source "$(dirname "$0")/version-config.sh" "${1:-8}"
 
 # Check if the container image exists
 if [ ! -f image/${CONTAINER_NAME}.tar.gz ]; then

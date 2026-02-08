@@ -1,6 +1,6 @@
 # GitHub Container Registry へのコンテナイメージ公開ガイド
 
-このドキュメントでは、Oracle Linux 8 開発用コンテナイメージを GitHub Container Registry (ghcr.io) に公開する方法を説明します。
+このドキュメントでは、Oracle Linux 開発用コンテナイメージを GitHub Container Registry (ghcr.io) に公開する方法を説明します。
 
 ## 目次
 
@@ -39,7 +39,7 @@ export GITHUB_TOKEN="ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 export GITHUB_USER="your-github-username"
 
 # リポジトリ名
-export GITHUB_REPO="oracle-linux-8-container"
+export GITHUB_REPO="oracle-linux-container"
 ```
 
 ## 手動公開
@@ -48,7 +48,7 @@ export GITHUB_REPO="oracle-linux-8-container"
 
 ```bash
 # プロジェクトディレクトリに移動
-cd /path/to/oracle-linux-8-container
+cd /path/to/oracle-linux-container
 
 # イメージをビルド
 ./build-pod.sh
@@ -58,7 +58,7 @@ cd /path/to/oracle-linux-8-container
 
 ```bash
 # ローカルイメージ名を確認
-podman images | grep oracle-linux-8
+podman images | grep oracle-linux-8-dev
 
 # GitHub Container Registry 用にタグ付け
 podman tag oracle-linux-8-dev:latest \
@@ -305,8 +305,8 @@ podman inspect ghcr.io/${GITHUB_USER}/${GITHUB_REPO}/oracle-linux-8-dev:latest \
 
 ```json
 {
-  "org.opencontainers.image.title": "Oracle Linux 8 Development Container",
-  "org.opencontainers.image.description": "Oracle Linux 8 based development container with Node.js, Java, .NET, Python, Doxygen, PlantUML, and other development tools",
+  "org.opencontainers.image.title": "Oracle Linux Development Container",
+  "org.opencontainers.image.description": "Oracle Linux based development container with Node.js, Java, .NET, Python, Doxygen, PlantUML, and other development tools",
   "org.opencontainers.image.licenses": "GPL-2.0",
   "org.opencontainers.image.vendor": "Oracle America, Inc.",
   "org.opencontainers.image.base.name": "oraclelinux:8"

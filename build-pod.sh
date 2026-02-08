@@ -3,7 +3,7 @@
 # rootless podman-compose では、正しく UID のマッピングができない (userns が利用できない) ため、
 # podman を直接操作する
 
-CONTAINER_NAME=oracle-linux-8
+source "$(dirname "$0")/version-config.sh" "${1:-8}" "${2:-1}"
 
 # src/keys が存在しない場合は作成
 if [ ! -d ./src/keys ]; then
@@ -55,7 +55,7 @@ fi
     printf "%-18s = %s\n" "BUILDER" "${USER}"
 } > ./src/container-release
 
-echo "Building container image..."
+echo "Building container image: ${CONTAINER_NAME} (OL${OL_VERSION})..."
 
 # 既存のコンテナを停止
 source ./stop-pod.sh
@@ -66,7 +66,7 @@ echo "Clean old container successfully."
 
 # イメージをビルド
 echo "Building image..."
-podman build -t ${CONTAINER_NAME} ./src/
+podman build --build-arg OL_VERSION=${OL_VERSION} -t ${CONTAINER_NAME} ./src/
 
 if [ $? -ne 0 ]; then
     echo "Error: Failed to build container."

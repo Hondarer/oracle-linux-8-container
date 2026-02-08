@@ -1,6 +1,6 @@
 # Python プロジェクトのサンプル
 
-このドキュメントでは、Python プロジェクトで Oracle Linux 8 開発用コンテナイメージを使用する GitHub Actions ワークフローの例を示します。
+このドキュメントでは、Python プロジェクトで Oracle Linux 開発用コンテナイメージを使用する GitHub Actions ワークフローの例を示します。
 
 ## 完全なワークフロー例
 

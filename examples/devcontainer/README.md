@@ -1,6 +1,6 @@
 # Dev Container サンプル設定
 
-このディレクトリには、公開されている Oracle Linux 8 コンテナイメージを使用して、あなたのプロジェクトで Dev Container を設定するためのサンプルが含まれています。
+このディレクトリには、公開されている Oracle Linux コンテナイメージを使用して、あなたのプロジェクトで Dev Container を設定するためのサンプルが含まれています。OL8 と OL10 のバリアントが `ol8/` と `ol10/` サブディレクトリに用意されています。
 
 ## クイックスタート
 
@@ -10,7 +10,7 @@
 
 ```bash
 # あなたのプロジェクトディレクトリで
-cp -r /path/to/oracle-linux-8-container/examples/devcontainer .devcontainer
+cp -r /path/to/oracle-linux-container/examples/devcontainer/ol8 .devcontainer
 ```
 
 ### 2. VS Code で開く
@@ -23,7 +23,7 @@ cp -r /path/to/oracle-linux-8-container/examples/devcontainer .devcontainer
 
 ## 含まれる開発ツール
 
-- **言語ランタイム**: Node.js 22, Java 17, .NET 9.0, Python 3.11
+- **言語ランタイム**: Node.js 22, Java 17(OL8)/21(OL10), .NET 10, Python 3.11(OL8)/3.12(OL10)
 - **ビルドツール**: GCC, CMake, Make, automake
 - **ドキュメント**: Doxygen, PlantUML, Pandoc
 - **テスト**: GoogleTest, Jest, JUnit, pytest, xUnit
@@ -31,8 +31,11 @@ cp -r /path/to/oracle-linux-8-container/examples/devcontainer .devcontainer
 
 ## ファイル構成
 
-- `devcontainer.json` - Dev Container の設定ファイル
-  - 公開イメージ (`ghcr.io/hondarer/oracle-linux-8-container/oracle-linux-8-dev:latest`) を使用
+- `ol8/devcontainer.json` - OL8 用 Dev Container 設定ファイル
+  - 公開イメージ (`ghcr.io/hondarer/oracle-linux-container/oracle-linux-8-dev:latest`) を使用
+- `ol10/devcontainer.json` - OL10 用 Dev Container 設定ファイル
+  - 公開イメージ (`ghcr.io/hondarer/oracle-linux-container/oracle-linux-10-dev:latest`) を使用
+- 共通機能:
   - ホストのユーザー名とUID/GIDを自動マッピング
   - 推奨VS Code拡張機能の自動インストール
   - ホームディレクトリの永続化

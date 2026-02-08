@@ -1,11 +1,11 @@
 # Third-Party Component Licenses
 
-このドキュメントは、Oracle Linux 8 Development Container で使用されているサードパーティコンポーネントとそのライセンス情報を記載しています。
+このドキュメントは、Oracle Linux Development Container で使用されているサードパーティコンポーネントとそのライセンス情報を記載しています。
 
 ## ベースイメージとOS
 
-### Oracle Linux 8
-- **バージョン**: 8
+### Oracle Linux 8/10
+- **バージョン**: 8/10
 - **ライセンス**: GPLv2 and other open source licenses
 - **URL**: https://www.oracle.com/linux/
 - **説明**: コンテナイメージのベースOS
@@ -19,19 +19,19 @@
 - **説明**: JavaScript/TypeScript ランタイム環境
 
 ### OpenJDK (Java)
-- **バージョン**: 17
+- **バージョン**: 17 (OL8) / 21 (OL10)
 - **ライセンス**: GPLv2 with Classpath Exception
 - **URL**: https://openjdk.org/
 - **説明**: Java 開発キットとランタイム
 
 ### .NET SDK
-- **バージョン**: 9.0
+- **バージョン**: 10.0
 - **ライセンス**: MIT License
 - **URL**: https://dotnet.microsoft.com/
 - **説明**: .NET 開発環境
 
 ### Python
-- **バージョン**: 3.11
+- **バージョン**: 3.11 (OL8) / 3.12 (OL10)
 - **ライセンス**: PSF License (Python Software Foundation License)
 - **URL**: https://www.python.org/
 - **説明**: Python プログラミング言語
@@ -57,10 +57,11 @@
 - **説明**: ソースコードドキュメント生成ツール
 
 ### doxybook2
-- **バージョン**: 1.6.1 (Custom build for el8)
+- **バージョン**: 1.6.1 (Custom build for el8/el10)
 - **ライセンス**: MIT License
 - **URL**: https://github.com/matusnovak/doxybook2
-- **Custom build**: https://github.com/Hondarer/doxybook2.el8.x86_64
+- **Custom build (OL8)**: https://github.com/Hondarer/doxybook2.el8.x86_64
+- **Custom build (OL10)**: https://github.com/Hondarer/doxybook2.el10.x86_64
 - **説明**: Doxygen XML を Markdown に変換するツール
 
 ### PlantUML
@@ -92,17 +93,22 @@
 
 ## フォント
 
-### VLGothic
+### VLGothic (OL8 のみ)
 - **ライセンス**: BSD License (mplus) + custom license
 - **URL**: https://github.com/project-vc/vlgothic
 - **説明**: 日本語 Gothic フォント
+
+### Google Noto Sans CJK (OL10 のみ)
+- **ライセンス**: SIL Open Font License 1.1
+- **URL**: https://github.com/googlefonts/noto-cjk
+- **説明**: Google Noto CJK フォント（日本語・中国語・韓国語）
 
 ### Liberation Fonts
 - **ライセンス**: SIL Open Font License 1.1
 - **URL**: https://github.com/liberationfonts/liberation-fonts
 - **説明**: メトリック互換フォント
 
-### Cantarell
+### Cantarell (OL8 のみ)
 - **ライセンス**: SIL Open Font License 1.1
 - **URL**: https://gitlab.gnome.org/GNOME/cantarell-fonts
 - **説明**: GNOME デフォルトフォント
@@ -136,6 +142,7 @@
 
 ### GNU Development Tools
 - **パッケージ**: gcc, make, automake, autoconf, libtool, binutils
+- **バージョン**: GCC 8 (OL8) / GCC 14 (OL10)
 - **ライセンス**: GPLv3 or later
 - **URL**: https://www.gnu.org/
 - **説明**: GNU コンパイラコレクションとビルドツール
@@ -216,4 +223,4 @@
 
 ## 更新履歴
 
-- 2025-11-15: 初版作成（実装に合わせてコンポーネントとライセンスを文書化）
+- 2025-11-15: 初版作成 (実装に合わせてコンポーネントとライセンスを文書化)

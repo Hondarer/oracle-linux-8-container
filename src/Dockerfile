@@ -1,11 +1,13 @@
-FROM oraclelinux:8
+ARG OL_VERSION=8
+FROM oraclelinux:${OL_VERSION}
+ARG OL_VERSION
 
 # メタデータラベル
-LABEL org.opencontainers.image.title="Oracle Linux 8 Development Container"
-LABEL org.opencontainers.image.description="Oracle Linux 8 based development container with Node.js, Java, .NET, Python, Doxygen, PlantUML, and other development tools"
+LABEL org.opencontainers.image.title="Oracle Linux ${OL_VERSION} Development Container"
+LABEL org.opencontainers.image.description="Oracle Linux ${OL_VERSION} based development container with Node.js, Java, .NET, Python, Doxygen, PlantUML, and other development tools"
 LABEL org.opencontainers.image.licenses="GPL-2.0 AND MIT AND BSD-3-Clause AND PSF-2.0 AND OFL-1.1"
 LABEL org.opencontainers.image.vendor="Oracle America, Inc."
-LABEL org.opencontainers.image.base.name="oraclelinux:8"
+LABEL org.opencontainers.image.base.name="oraclelinux:${OL_VERSION}"
 
 # ポート 22 を公開する宣言
 EXPOSE 22
@@ -34,15 +36,20 @@ RUN echo "Listing users with UID >= 1000:"; \
 # パッケージのインストール
 # dnf update -y は、ベースイメージが最新の場合、ビルド時間を増やすだけであり不要。
 RUN dnf install -y \
-        oracle-epel-release-el8 \
+        oracle-epel-release-el${OL_VERSION} \
         dnf-plugins-core && \
+    # リポジトリの有効化 (OL10 では EPEL は oracle-epel-release-el10 により自動有効化済み)
     dnf config-manager --enable \
-        ol8_codeready_builder \
-        ol8_developer_EPEL && \
+        ol${OL_VERSION}_codeready_builder && \
+    if [ "${OL_VERSION}" = "8" ]; then \
+        dnf config-manager --enable ol8_developer_EPEL; \
+    fi && \
     dnf group install -y 'Development Tools' && \
-    dnf module -y enable nodejs:22 && \
+    # OL8: Node.js はモジュールで有効化が必要
+    if [ "${OL_VERSION}" = "8" ]; then \
+        dnf module -y enable nodejs:22; \
+    fi && \
     dnf install -y \
-        abattis-cantarell-fonts \
         adwaita-cursor-theme \
         adwaita-icon-theme \
         at-spi2-atk \
@@ -53,7 +60,6 @@ RUN dnf install -y \
         cmake \
         colord-libs \
         dconf \
-        dejavu-fonts-common \
         dejavu-sans-mono-fonts \
         desktop-file-utils \
         dotnet-sdk-10.0 \
@@ -64,8 +70,6 @@ RUN dnf install -y \
         gsettings-desktop-schemas \
         gtk3 \
         hwdata \
-        java-17-openjdk \
-        java-17-openjdk-devel \
         libssh-devel \
         jq \
         json-glib \
@@ -82,10 +86,8 @@ RUN dnf install -y \
         liberation-sans-fonts \
         liberation-serif-fonts \
         libgusb \
-        libmodman \
         libpciaccess \
         libproxy \
-        libsoup \
         libstdc++-static \
         libwayland-client \
         libwayland-cursor \
@@ -93,7 +95,6 @@ RUN dnf install -y \
         libwayland-server \
         libxkbcommon \
         libxshmfence \
-        llvm-compat-libs \
         lsof \
         man-db \
         man-pages \
@@ -103,21 +104,37 @@ RUN dnf install -y \
         nodejs \
         npm \
         perl-Env \
-        python3.11-pip \
-        rest \
         rsync \
         sudo \
         sysstat \
         tree \
         unzip \
-        vlgothic-fonts \
         vulkan-loader \
         xdg-utils \
-        xkeyboard-config && \
-    alternatives --set java $(alternatives --display java 2>/dev/null | grep -E "java-17-openjdk.*bin/java" | head -1 | awk '{print $1}') && \
-    alternatives --set python /usr/bin/python3.11 && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1 && \
-    update-alternatives --install /usr/bin/pip pip /usr/bin/pip3.11 2 && \
+        xkeyboard-config \
+        # バージョン依存パッケージ
+        $(if [ "${OL_VERSION}" = "8" ]; then echo \
+            "java-17-openjdk java-17-openjdk-devel" \
+            "python3.11-pip" \
+            "llvm-compat-libs" \
+            "libmodman" \
+            "libsoup" \
+            "rest" \
+            "abattis-cantarell-fonts" \
+            "dejavu-fonts-common" \
+            "vlgothic-fonts"; \
+        else echo \
+            "java-21-openjdk java-21-openjdk-devel" \
+            "python3-pip" \
+            "google-noto-sans-cjk-fonts"; \
+        fi) && \
+    # alternatives の設定
+    if [ "${OL_VERSION}" = "8" ]; then \
+        alternatives --set java $(alternatives --display java 2>/dev/null | grep -E "java-17-openjdk.*bin/java" | head -1 | awk '{print $1}') && \
+        alternatives --set python /usr/bin/python3.11 && \
+        update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1 && \
+        update-alternatives --install /usr/bin/pip pip /usr/bin/pip3.11 2; \
+    fi && \
     pip install \
         hjson \
         gcovr && \
@@ -153,18 +170,24 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
         sh /tmp/packages/man-pages-ja-auto-installer.sh; \
     fi && \
     cd /tmp && rm -rf man-pages-ja-20251115 && \
-    # doxybook2
-    if [ ! -f packages/doxybook2.el8.x86_64-1.6.1.tar.gz ]; then \
-        curl -fsSL -o /tmp/doxybook2.el8.x86_64-1.6.1.tar.gz https://github.com/Hondarer/doxybook2.el8.x86_64/archive/refs/tags/v1.6.1.tar.gz; \
+    # doxybook2 (バージョン依存バイナリ)
+    DOXYBOOK2_ARCH="doxybook2.el${OL_VERSION}.x86_64" && \
+    DOXYBOOK2_PKG="${DOXYBOOK2_ARCH}-1.6.1.tar.gz" && \
+    DOXYBOOK2_URL="https://github.com/Hondarer/${DOXYBOOK2_ARCH}/archive/refs/tags/v1.6.1.tar.gz" && \
+    DOXYBOOK2_DIR="${DOXYBOOK2_ARCH}-1.6.1" && \
+    if [ ! -f "packages/${DOXYBOOK2_PKG}" ]; then \
+        curl -fsSL -o "/tmp/${DOXYBOOK2_PKG}" "${DOXYBOOK2_URL}" || echo "Warning: doxybook2 for el${OL_VERSION} not available, skipping"; \
     else \
-        cp packages/doxybook2.el8.x86_64-1.6.1.tar.gz /tmp/; \
+        cp "packages/${DOXYBOOK2_PKG}" /tmp/; \
     fi && \
-    tar xfz doxybook2.el8.x86_64-1.6.1.tar.gz && \
-    chown -R root:root doxybook2.el8.x86_64-1.6.1 && \
-    cp -rp doxybook2.el8.x86_64-1.6.1/bin/* /usr/local/bin/ && \
-    cp -rp doxybook2.el8.x86_64-1.6.1/include/* /usr/local/include/ && \
-    cp -rp doxybook2.el8.x86_64-1.6.1/lib/* /usr/local/lib/ && \
-    rm -rf doxybook2.el8.x86_64-1.6.1 && \
+    if [ -f "/tmp/${DOXYBOOK2_PKG}" ]; then \
+        tar xfz "${DOXYBOOK2_PKG}" && \
+        chown -R root:root "${DOXYBOOK2_DIR}" && \
+        cp -rp "${DOXYBOOK2_DIR}/bin/"* /usr/local/bin/ && \
+        cp -rp "${DOXYBOOK2_DIR}/include/"* /usr/local/include/ && \
+        cp -rp "${DOXYBOOK2_DIR}/lib/"* /usr/local/lib/ && \
+        rm -rf "${DOXYBOOK2_DIR}"; \
+    fi && \
     # pandoc
     if [ ! -f packages/pandoc-3.7.0.2-linux-amd64.tar.gz ]; then \
         curl -fsSL -o /tmp/pandoc-3.7.0.2-linux-amd64.tar.gz https://github.com/jgm/pandoc/releases/download/3.7.0.2/pandoc-3.7.0.2-linux-amd64.tar.gz; \
@@ -279,7 +302,7 @@ RUN echo "Processing manual pages with mandb..."; \
 # SSH ホストキーの配置または生成
 # keys にssh_host_*_key* が存在する場合は、ファイルを /etc/ssh にコピーし適切なオーナー、パーミッションを設定
 # 存在しない場合は、SSH ホストキーの生成
-# SSH ホストキー生成後の再接続時は `ssh-keygen -R "[127.0.0.1]:40022"` などを行い過去のホストキーをクリアすること
+# SSH ホストキー生成後の再接続時は `ssh-keygen -R "[127.0.0.1]:40822"` などを行い過去のホストキーをクリアすること
 ADD keys /tmp/keys/
 RUN if [ -n "$(ls -A /tmp/keys/ssh_host_*_key* 2>/dev/null)" ]; then \
         echo "Using existing SSH host keys"; \

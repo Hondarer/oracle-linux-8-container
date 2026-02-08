@@ -4,23 +4,30 @@
 
 ## 概要
 
-このプロジェクトは、Oracle Linux 8 ベースのポータブルな開発用コンテナを Podman で構築・管理するためのシステムです。コンテナには開発ツール (Node.js、Java、.NET、Python)、ドキュメント生成ツール (Doxygen、PlantUML、Pandoc)、日本語マニュアルページが含まれます。
+このプロジェクトは、Oracle Linux (8/10) ベースのポータブルな開発用コンテナを Podman で構築・管理するためのシステムです。コンテナには開発ツール (Node.js、Java、.NET、Python)、ドキュメント生成ツール (Doxygen、PlantUML、Pandoc)、日本語マニュアルページが含まれます。
 
 ## アーキテクチャ
 
-- **ベースイメージ**: Oracle Linux 8
+- **ベースイメージ**: Oracle Linux 8 / 10 (ARG OL_VERSION でパラメータ化)
 - **コンテナエンジン**: Podman (rootless mode)
 - **主要ディレクトリ**:
   - `src/`: コンテナイメージのビルドファイル群
-  - `storage/`: ホストとコンテナ間の永続化データ
+  - `storage/`: ホストとコンテナ間の永続化データ (`storage/{version}/{instance}/`)
   - `image/`: イメージの tar ファイル保存場所
+
+### マルチバージョン設計
+
+- `version-config.sh`: 全スクリプトが source する共通設定ファイル
+- 引数: `$1` = OL_VERSION (8 or 10)、`$2` = INSTANCE_NUM (デフォルト: 1)
+- ポート番号: `40000 + (OL_VERSION * 100) + (21 + INSTANCE_NUM)` (例: OL8#1=40822, OL10#1=41022)
+- コンテナ名: `oracle-linux-{ver}_{instance}` (例: `oracle-linux-8_1`)
 
 ### コンテナビルド仕様
 
-Dockerfile はポータブルイメージとして以下をセットアップします。
+Dockerfile は `ARG OL_VERSION` により、OL8/OL10 の両方をサポートします。
 
-1. Oracle Linux 8 パッケージの更新と開発ツールの導入
-2. 開発環境 (Node.js 22、Java 17、.NET 10、Python 3.11)
+1. Oracle Linux パッケージの更新と開発ツールの導入
+2. 開発環境 (Node.js 22、Java 17/21、.NET 10、Python 3.11/3.12)
 3. ドキュメント生成ツール (Doxygen、PlantUML、Pandoc 系)
 4. 日本語環境とフォント設定
 5. SSH サーバーと認証キー設定
@@ -41,30 +48,36 @@ Dockerfile はポータブルイメージとして以下をセットアップし
 ### コンテナ管理
 
 ```bash
-# イメージビルド
-./build-pod.sh
+# イメージビルド (引数: OL_VERSION [INSTANCE_NUM])
+./build-pod.sh 8        # OL8 をビルド
+./build-pod.sh 10       # OL10 をビルド
 
 # コンテナ起動
-./start-pod.sh
+./start-pod.sh 8        # OL8 を起動
+./start-pod.sh 10       # OL10 を起動
 
 # コンテナ停止
-./stop-pod.sh
+./stop-pod.sh 8
+./stop-pod.sh 10
 
 # イメージ保存 (圧縮 tar として)
-./save-pod.sh
+./save-pod.sh 8
 
 # イメージ読み込み
-./load-pod.sh
+./load-pod.sh 8
 ```
 
 ### 接続方法
 
 ```bash
-# SSH 接続 (ポート 40022)
-ssh -p 40022 user@127.0.0.1
+# OL8 SSH 接続 (ポート 40822)
+ssh -p 40822 user@127.0.0.1
+
+# OL10 SSH 接続 (ポート 41022)
+ssh -p 41022 user@127.0.0.1
 
 # SSH 鍵キャッシュのクリア (新規ビルド後)
-ssh-keygen -R "[127.0.0.1]:40022"
+ssh-keygen -R "[127.0.0.1]:40822"
 ```
 
 ## 重要な設定
@@ -78,8 +91,8 @@ ssh-keygen -R "[127.0.0.1]:40022"
 
 ### マウント設定
 
-- `./storage/1/home_${USER}` → `/home/${USER}` (ホームディレクトリ)
-- `./storage/1/workspace` → `/workspace` (作業ディレクトリ)
+- `./storage/{ver}/{inst}/home_${USER}` → `/home/${USER}` (ホームディレクトリ)
+- `./storage/{ver}/{inst}/workspace` → `/workspace` (作業ディレクトリ)
 
 ### 環境変数
 
@@ -90,7 +103,7 @@ ssh-keygen -R "[127.0.0.1]:40022"
 
 ### インストール済みツール
 
-- **言語ランタイム**: Node.js 22、Java 17、.NET 10、Python 3.11
+- **言語ランタイム**: Node.js 22、Java 17(OL8)/21(OL10)、.NET 10、Python 3.11(OL8)/3.12(OL10)
 - **ビルドツール**: GCC、Make、CMake、automake、libtool
 - **ドキュメント**: Doxygen、doxybook2、PlantUML、Pandoc
 - **テスト**: GoogleTest (システムワイド)
@@ -100,7 +113,7 @@ ssh-keygen -R "[127.0.0.1]:40022"
 
 - **Node.js**: npm (ユーザーローカルプレフィックス設定済み)
 - **Python**: pip (システムとユーザー両方利用可能)
-- **Java**: OpenJDK 17 がデフォルト
+- **Java**: OpenJDK 17(OL8) / 21(OL10) がデフォルト
 - **.NET**: SDK 10
 
 ### カスタムインストール処理
@@ -111,6 +124,7 @@ ssh-keygen -R "[127.0.0.1]:40022"
 
 ## ファイル配置規則
 
+- `version-config.sh`: バージョン別共通設定 (全スクリプトが source)
 - `src/keys/`: SSH ホストキー (オプション)
 - `src/fonts/`: 追加フォントファイル (オプション)
 - `src/packages/`: 追加パッケージの事前ダウンロード (オプション)

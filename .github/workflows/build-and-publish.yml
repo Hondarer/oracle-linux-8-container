@@ -17,6 +17,9 @@ env:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ol_version: ["8", "10"]
     permissions:
       contents: read
       packages: write
@@ -28,7 +31,7 @@ jobs:
       - name: Set lowercase repository name
         id: repo
         run: |
-          echo "IMAGE_NAME=$(echo '${{ github.repository }}/oracle-linux-8-dev' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+          echo "IMAGE_NAME=$(echo '${{ github.repository }}/oracle-linux-${{ matrix.ol_version }}-dev' | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
 
       - name: Set up Podman
         run: |
@@ -95,7 +98,10 @@ jobs:
           } > src/container-release
 
           cd src
+          # OCI イメージラベル: GitHub Packages のパッケージ説明として表示される
           podman build \
+            --build-arg OL_VERSION=${{ matrix.ol_version }} \
+            --label "org.opencontainers.image.description=Oracle Linux ${{ matrix.ol_version }} development container image with Node.js, Java, .NET, Python, and documentation tools" \
             --label "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
             --label "org.opencontainers.image.revision=${{ github.sha }}" \
             --label "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
@@ -180,10 +186,11 @@ jobs:
             WSL_TAG="${tag}-wsl"
             echo "Pushing WSL rootfs: $WSL_TAG"
 
+            # OCI アノテーション: GitHub Packages のパッケージ説明として表示される
             ./oras push "$WSL_TAG" \
               wsl-rootfs.tar.gz:application/vnd.wsl.rootfs.v1.tar+gzip \
-              --annotation "org.opencontainers.image.title=WSL2 Rootfs for Oracle Linux 8 Development" \
-              --annotation "org.opencontainers.image.description=Pre-built rootfs for importing into WSL2" \
+              --annotation "org.opencontainers.image.title=WSL2 Rootfs for Oracle Linux ${{ matrix.ol_version }} Development" \
+              --annotation "org.opencontainers.image.description=Oracle Linux ${{ matrix.ol_version }} development environment as WSL2-importable rootfs" \
               --annotation "org.opencontainers.image.source=https://github.com/${{ github.repository }}" \
               --annotation "org.opencontainers.image.revision=${{ github.sha }}" \
               --annotation "org.opencontainers.image.created=$(date -u +'%Y-%m-%dT%H:%M:%SZ')"
@@ -194,7 +201,7 @@ jobs:
       - name: Output image information
         if: github.event_name != 'pull_request'
         run: |
-          echo "## Container Image Published" >> $GITHUB_STEP_SUMMARY
+          echo "## Container Image Published (OL${{ matrix.ol_version }})" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "**Registry:** ${{ env.REGISTRY }}" >> $GITHUB_STEP_SUMMARY
           echo "**Image:** ${{ env.IMAGE_NAME }}" >> $GITHUB_STEP_SUMMARY

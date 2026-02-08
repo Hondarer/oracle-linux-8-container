@@ -3,7 +3,7 @@
 # rootless podman-compose では、正しく UID のマッピングができない (userns が利用できない) ため、
 # podman を直接操作する
 
-CONTAINER_NAME=oracle-linux-8
+source "$(dirname "$0")/version-config.sh" "${1:-8}" "${2:-1}"
 
 # 既存のコンテナを停止
 source ./stop-pod.sh
@@ -20,19 +20,27 @@ fi
 # USER, UID は OS にて設定済
 GID=$(id -g)
 
-echo "Starting container with user: ${USER} (UID: ${UID}, GID: ${GID})"
+echo "Starting container ${CONTAINER_INSTANCE} (OL${OL_VERSION}) with user: ${USER} (UID: ${UID}, GID: ${GID})"
+
+# ストレージ移行ガイダンス
+if [ "${OL_VERSION}" = "8" ] && [ -d "./storage/1" ] && [ ! -d "./storage/8" ]; then
+    echo ""
+    echo "Note: Storage structure has changed from ./storage/1/ to ./storage/8/1/"
+    echo "To migrate existing data: mkdir -p ./storage/8 && mv ./storage/1 ./storage/8/1"
+    echo ""
+fi
 
 # ホスト側ディレクトリ準備
-mkdir -p ./storage/1/home_${USER}
-mkdir -p ./storage/1/workspace
+mkdir -p ${STORAGE_DIR}/home_${USER}
+mkdir -p ${STORAGE_DIR}/workspace
 
 # ~/.ssh/id_rsa.pub があれば、.ssh/authorized_keys に設定
-if [ -f ~/.ssh/id_rsa.pub ] && [ ! -f ./storage/1/home_${USER}/.ssh/authorized_keys ]; then
-    mkdir -p ./storage/1/home_${USER}/.ssh
-    cp ~/.ssh/id_rsa.pub ./storage/1/home_${USER}/.ssh/authorized_keys
+if [ -f ~/.ssh/id_rsa.pub ] && [ ! -f ${STORAGE_DIR}/home_${USER}/.ssh/authorized_keys ]; then
+    mkdir -p ${STORAGE_DIR}/home_${USER}/.ssh
+    cp ~/.ssh/id_rsa.pub ${STORAGE_DIR}/home_${USER}/.ssh/authorized_keys
     # パーミッションの設定
-    chmod 700 ./storage/1/home_${USER}/.ssh
-    chmod 600 ./storage/1/home_${USER}/.ssh/authorized_keys
+    chmod 700 ${STORAGE_DIR}/home_${USER}/.ssh
+    chmod 600 ${STORAGE_DIR}/home_${USER}/.ssh/authorized_keys
 fi
 
 # コンテナ起動 (UID マッピング + 環境変数でユーザー情報を渡す)
@@ -40,12 +48,12 @@ fi
 # コンテナ内で初期化操作を行いたいため、root で起動
 echo "Starting container with keep-id userns..."
 podman run -d \
-    --name ${CONTAINER_NAME}_1 \
+    --name ${CONTAINER_INSTANCE} \
     --userns=keep-id \
     --user root \
-    -p 40022:22 \
-    -v ./storage/1/home_${USER}:/home/${USER}:Z \
-    -v ./storage/1/workspace:/workspace:Z \
+    -p ${SSH_HOST_PORT}:22 \
+    -v ${STORAGE_DIR}/home_${USER}:/home/${USER}:Z \
+    -v ${STORAGE_DIR}/workspace:/workspace:Z \
     --restart unless-stopped \
     --env HOST_USER=${USER} \
     --env HOST_UID=${UID} \
@@ -60,12 +68,12 @@ fi
 # 確認
 
 echo -e "=== Container Info ==="
-podman ps | grep ${CONTAINER_NAME}_1
+podman ps | grep ${CONTAINER_INSTANCE}
 
 #echo -e "=== UID/GID Mapping Check ==="
-#podman exec ${CONTAINER_NAME}_1 id
+#podman exec ${CONTAINER_INSTANCE} id
 
 #echo -e "=== File Permissions Check ==="
-#podman exec ${CONTAINER_NAME}_1 ls -la /workspace
+#podman exec ${CONTAINER_INSTANCE} ls -la /workspace
 
-echo "Container started successfully."
+echo "Container ${CONTAINER_INSTANCE} started successfully. (SSH port: ${SSH_HOST_PORT})"

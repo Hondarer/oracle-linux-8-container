@@ -1,6 +1,6 @@
 # Java プロジェクトのサンプル
 
-このドキュメントでは、Java プロジェクト（Maven）で Oracle Linux 8 開発用コンテナイメージを使用する GitHub Actions ワークフローの例を示します。
+このドキュメントでは、Java プロジェクト（Maven）で Oracle Linux 開発用コンテナイメージを使用する GitHub Actions ワークフローの例を示します。
 
 ## 完全なワークフロー例 (Maven)
 
