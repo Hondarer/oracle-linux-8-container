@@ -134,6 +134,9 @@ RUN dnf install -y \
         alternatives --set python /usr/bin/python3.11 && \
         update-alternatives --install /usr/bin/pip pip /usr/bin/pip3 1 && \
         update-alternatives --install /usr/bin/pip pip /usr/bin/pip3.11 2; \
+    else \
+        alternatives --install /usr/bin/python python /usr/bin/python3 1 && \
+        alternatives --install /usr/bin/pip pip /usr/bin/pip3 1; \
     fi && \
     pip install \
         hjson \
