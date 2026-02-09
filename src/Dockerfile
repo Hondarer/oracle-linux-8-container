@@ -174,22 +174,16 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     fi && \
     cd /tmp && rm -rf man-pages-ja-20251115 && \
     # doxybook2 (バージョン依存バイナリ)
-    DOXYBOOK2_ARCH="doxybook2.el${OL_VERSION}.x86_64" && \
-    DOXYBOOK2_PKG="${DOXYBOOK2_ARCH}-1.6.1.tar.gz" && \
-    DOXYBOOK2_URL="https://github.com/Hondarer/${DOXYBOOK2_ARCH}/archive/refs/tags/v1.6.1.tar.gz" && \
-    DOXYBOOK2_DIR="${DOXYBOOK2_ARCH}-1.6.1" && \
-    if [ ! -f "packages/${DOXYBOOK2_PKG}" ]; then \
-        curl -fsSL -o "/tmp/${DOXYBOOK2_PKG}" "${DOXYBOOK2_URL}" || echo "Warning: doxybook2 for el${OL_VERSION} not available, skipping"; \
+    DOXYBOOK2_URL="https://github.com/Hondarer/doxybook2-bin/raw/main/bin/linux-el${OL_VERSION}-x64/doxybook2" && \
+    if [ ! -f "packages/doxybook2" ]; then \
+        curl -fsSL -o "/tmp/doxybook2" "${DOXYBOOK2_URL}" || echo "Warning: doxybook2 for el${OL_VERSION} not available, skipping"; \
     else \
-        cp "packages/${DOXYBOOK2_PKG}" /tmp/; \
+        cp "packages/doxybook2" /tmp/; \
     fi && \
-    if [ -f "/tmp/${DOXYBOOK2_PKG}" ]; then \
-        tar xfz "${DOXYBOOK2_PKG}" && \
-        chown -R root:root "${DOXYBOOK2_DIR}" && \
-        cp -rp "${DOXYBOOK2_DIR}/bin/"* /usr/local/bin/ && \
-        cp -rp "${DOXYBOOK2_DIR}/include/"* /usr/local/include/ && \
-        cp -rp "${DOXYBOOK2_DIR}/lib/"* /usr/local/lib/ && \
-        rm -rf "${DOXYBOOK2_DIR}"; \
+    if [ -f "/tmp/doxybook2" ]; then \
+        chmod +x /tmp/doxybook2 && \
+        cp /tmp/doxybook2 /usr/local/bin/ && \
+        rm -f /tmp/doxybook2; \
     fi && \
     # pandoc
     if [ ! -f packages/pandoc-3.7.0.2-linux-amd64.tar.gz ]; then \
