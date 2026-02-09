@@ -364,7 +364,7 @@ podman history ghcr.io/<user>/<repo>/oracle-linux-8-dev:latest
 
 ### 言語・フレームワーク別サンプル
 
-- [C/C++ プロジェクト](./cpp-example.md) - CMake、GoogleTest、Doxygen
+- [C/C++ プロジェクト](./cpp-example.md) - CMake、Doxygen
 - [Node.js プロジェクト](./nodejs-example.md) - npm、Jest、ESLint
 - [Java プロジェクト](./java-example.md) - Maven、JUnit、JavaDoc
 - [Python プロジェクト](./python-example.md) - pytest、flake8、カバレッジ

@@ -89,9 +89,6 @@ OL10 インスタンス1: 41022  インスタンス2: 41023  インスタンス3
    - OL8: `doxybook2.el8.x86_64`
    - OL10: `doxybook2.el10.x86_64` (要事前ビルド。未準備の場合はスキップ)
 
-7. **googletestの条件分岐**:
-   - EL8/EL10 で共有ライブラリの互換性が異なる可能性。要検証。
-
 ### Step 3: シェルスクリプトの改修
 
 全スクリプトで `CONTAINER_NAME=oracle-linux-8` の行を削除し、代わりに `version-config.sh` を source する。
@@ -215,6 +212,5 @@ README にも移行手順を記載。
 ## 前提・リスク
 
 - **doxybook2 の OL10 ビルド**: 事前に `doxybook2.el10.x86_64` の作成が必要。未準備の場合は OL10 ビルドで doxybook2 をスキップする条件分岐を入れる
-- **googletest の OL10 互換性**: プリコンパイル済みライブラリが OL10 で動くか要検証
 - **OL10 パッケージ名変更**: 一部パッケージ（`libsoup`, `rest`, `libmodman`, `llvm-compat-libs`）が OL10 で名前変更・廃止されている可能性あり。ビルド時に確認し、条件分岐で対応
 - **既存環境への影響**: ストレージパス変更 (`./storage/1/` → `./storage/8/1/`) およびポート変更 (`40022` → `40822`) は breaking change。移行ガイダンスを提供

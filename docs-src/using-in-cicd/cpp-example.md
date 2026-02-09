@@ -232,38 +232,6 @@ jobs:
         run: make dist
 ```
 
-## GoogleTest を使用する場合
-
-このコンテナには GoogleTest がプリインストールされています。
-
-### CMakeLists.txt の設定例
-
-```cmake
-cmake_minimum_required(VERSION 3.14)
-project(MyProject)
-
-# GoogleTest を検索
-find_package(GTest REQUIRED)
-
-# テストを追加
-enable_testing()
-
-add_executable(my_test test/my_test.cpp)
-target_link_libraries(my_test GTest::gtest GTest::gtest_main)
-
-include(GoogleTest)
-gtest_discover_tests(my_test)
-```
-
-### ワークフローでのテスト実行
-
-```yaml
-- name: Run GoogleTest
-  run: |
-    cd build
-    ctest --output-on-failure
-```
-
 ## 静的解析の追加
 
 コード品質を向上させるために静的解析を追加できます。

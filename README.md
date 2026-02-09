@@ -33,7 +33,6 @@ Oracle Linux 8 および 10 のマルチバージョンに対応しています�
 
 ### テスト・ビルドツール
 
-- **GoogleTest** (システムワイド)
 - **Make**、**CMake**、**automake**、**libtool**
 - **pkg-config**、**cmake**
 
