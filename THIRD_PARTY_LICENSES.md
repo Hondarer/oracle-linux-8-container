@@ -82,15 +82,6 @@
 - **URL**: https://github.com/lierdakil/pandoc-crossref
 - **説明**: Pandoc の相互参照フィルター
 
-## テストフレームワーク
-
-### GoogleTest
-- **バージョン**: 1.17.0 (Prebuilt libraries)
-- **ライセンス**: BSD 3-Clause License
-- **URL**: https://github.com/google/googletest
-- **Prebuilt**: https://github.com/Hondarer/googletest-lib
-- **説明**: C++ 単体テストフレームワーク
-
 ## フォント
 
 ### VLGothic (OL8 のみ)

@@ -213,17 +213,6 @@ RUN --mount=type=bind,source=packages,target=/tmp/packages,readonly \
     install -m 0755 "pandoc-crossref" /usr/local/bin/pandoc-crossref && \
     install -m 0644 "pandoc-crossref.1.gz" /usr/local/share/man/man1/pandoc-crossref.1.gz && \
     rm -f pandoc-crossref pandoc-crossref.1.gz && \
-    # googletest
-    if [ ! -f packages/googletest-lib-1.17.0.tar.gz ]; then \
-        curl -fsSL -o /tmp/googletest-lib-1.17.0.tar.gz https://github.com/Hondarer/googletest-lib/archive/refs/tags/v1.17.0.tar.gz; \
-    else \
-        cp packages/googletest-lib-1.17.0.tar.gz /tmp/; \
-    fi && \
-    cd /tmp && tar xfz /tmp/googletest-lib-1.17.0.tar.gz && \
-    find googletest-lib-1.17.0 -type d -exec chmod 0755 {} + && \
-    find googletest-lib-1.17.0 -type f -exec chmod 0644 {} + && \
-    cd googletest-lib-1.17.0/include && cp -rp * /usr/local/include/. && \
-    cd ../lib/linux/x86_64/gcc/release && cp -rp * /usr/local/lib64/. && \
     # plantuml
     cd /tmp && \
     if [ ! -f packages/plantuml-1.2025.4.jar ]; then \

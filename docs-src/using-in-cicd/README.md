@@ -38,7 +38,6 @@ oracle-linux-8-dev:latest
 
 - **[C/C++ プロジェクト](./cpp-example.md)**
   - CMake によるビルド設定
-  - GoogleTest を使ったユニットテスト
   - gcovr によるコードカバレッジ測定
   - Doxygen によるドキュメント生成
 

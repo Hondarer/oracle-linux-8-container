@@ -80,11 +80,6 @@ URL: https://github.com/lierdakil/pandoc-crossref
 TESTING FRAMEWORKS
 ================================================================================
 
-Google Test (GoogleTest) 1.17.0
-License: BSD 3-Clause License
-Copyright: Google Inc.
-URL: https://github.com/google/googletest
-
 gcovr
 License: BSD 3-Clause License
 Copyright: gcovr authors

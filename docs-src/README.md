@@ -41,7 +41,7 @@
 - [CI/CD でのコンテナイメージ利用ガイド](./using-in-cicd/) - 概要と目次
   - [基本的な使い方](./using-in-cicd/basics.md) - イメージの取得、コンテナの起動、基本的なワークフロー
   - 言語・フレームワーク別サンプル
-    - [C/C++ プロジェクト](./using-in-cicd/cpp-example.md) - CMake、GoogleTest、Doxygen
+    - [C/C++ プロジェクト](./using-in-cicd/cpp-example.md) - CMake、Doxygen
     - [Node.js プロジェクト](./using-in-cicd/nodejs-example.md) - npm、Jest、ESLint
     - [Java プロジェクト](./using-in-cicd/java-example.md) - Maven、JUnit、JavaDoc
     - [Python プロジェクト](./using-in-cicd/python-example.md) - pytest、flake8、カバレッジ
